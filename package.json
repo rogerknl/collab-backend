@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/rogerknl/collab-backend#readme",
   "dependencies": {
+    "bitcore-explorers": "^1.0.1",
+    "bitcore-lib": "^0.15.0",
+    "browserify": "^16.2.2",
     "kcors": "^2.2.1",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",

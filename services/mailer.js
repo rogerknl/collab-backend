@@ -1,6 +1,5 @@
+'use strict';
 const nodemailer = require('nodemailer');
-
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -11,10 +10,10 @@ const transporter = nodemailer.createTransport({
 
 module.exports.testMail = () => {
   const mailOptions = {
-    from: process.env.EMAIL_USER, // sender address
-    to: 'roger.knl@gmail.com', // list of receivers
-    subject: 'Test de mailer', // Subject line
-    html: '<h1>Bon dia KNL!!</h1><p>Ara podem posar qualsevol cosa: ¯\\_(ツ)_/¯</p>'// plain text body
+    from: process.env.EMAIL_USER,
+    to: 'roger.knl@gmail.com',
+    subject: 'Test de mailer',
+    html: '<h1>Bon dia KNL!!</h1><p>Ara podem posar qualsevol cosa: ¯\\_(ツ)_/¯</p>'
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){

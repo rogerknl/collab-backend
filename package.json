@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",
-    "test": "mocha"
+    "test": "mocha",
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,10 @@
   },
   "homepage": "https://github.com/rogerknl/collab-backend#readme",
   "dependencies": {
+    "bitcore-explorers": "^1.0.1",
+    "bitcore-lib": "^0.15.0",
+    "browserify": "^16.2.2",
+    "dotenv": "^6.0.0",
     "kcors": "^2.2.1",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",

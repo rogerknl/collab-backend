@@ -23,8 +23,3 @@ module.exports = createWallet = () => {
     privateKeyWIF
   }
 }
-
-
-// TODO: npm uninstall bitcoinjs-lib
-// TODO: process.env.BITCOIN_NET
-// TODO: check if devdependencies should be normal dependencies

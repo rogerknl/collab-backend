@@ -25,7 +25,7 @@ const promisify = (fn) => (...args) => new Promise((resolve, reject) => {
 insight.getUnspentUtxosPromise = promisify(insight.getUnspentUtxos);
 insight.broadcastPromise = promisify(insight.broadcast);
 
-const makeTransaction = async (emisor, privateKey, receptor, amount) => {
+module.exports = makeTransaction = async (emisor, privateKey, receptor, amount) => {
   try {
     const utxos = await insight.getUnspentUtxosPromise(emisor);
     const tx = bitcore.Transaction();

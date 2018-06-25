@@ -12,9 +12,6 @@ const sequelize = new Sequelize( process.env.DB_NAME, process.env.DB_USER, proce
     acquire: 30000,
     idle: 10000
   },
-
-  // SQLite only
-  storage: 'path/to/database.sqlite'
 });
 sequelize
   .authenticate()
@@ -24,3 +21,8 @@ sequelize
   .catch(err => {
     console.error('Unable to connect to the database:', err);
   });
+
+module.exports = {
+  sequelize,
+  Sequelize
+};

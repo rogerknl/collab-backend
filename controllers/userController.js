@@ -1,6 +1,6 @@
 'use strict';
 
-const dbAccess = require( __dirname + '/../models/dbaccess' );
+const dbAccess = require( __dirname + '/../models/user' );
 
 exports.getAllUsers = async ctx => (ctx.body = await dbAccess.getAllUsers());
 exports.createUser = async (ctx) => {

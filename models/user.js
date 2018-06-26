@@ -1,6 +1,6 @@
 'use strict';
-
 const db = require(__dirname + '/../db/sequelize');
+
 
 
 const User = db.sequelize.define('USER', {
@@ -26,3 +26,7 @@ const User = db.sequelize.define('USER', {
     allowNull: true,
     },
 })
+// //User.hasMany(UserWallet, {as: 'uw_wallet_id', foreignKey: 'uw_wallet_id'})
+// User.belongsToMany(db.sequelize.Wallet, { through: db.sequelize.UserWallet });
+
+module.exports = User;

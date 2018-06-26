@@ -4,11 +4,15 @@ const app = new Koa();
 const bodyParser = require('koa-bodyparser');
 const logger = require('koa-logger');
 const cors = require('kcors');
+const jwt = require(__dirname + '/middleware/jwt')
+const errorHand = require (__dirname + '/middleware/error-handler');
 require('dotenv').config();
 
 const router = require(__dirname+'/routes.js');
 
 app
+.use(errorHand)
+.use(jwt)
 .use(logger())
 .use(cors())
 .use(bodyParser())

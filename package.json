@@ -7,6 +7,7 @@
     "dev": "nodemon app.js",
     "start": "node app.js",
     "test": "jest"
+    "migrate": "node_modules/.bin/sequelize db:migrate",
   },
   "repository": {
     "type": "git",
@@ -19,10 +20,12 @@
   },
   "homepage": "https://github.com/rogerknl/collab-backend#readme",
   "dependencies": {
+    "atob": "^2.1.1",
     "bcrypt": "^2.0.1",
     "bitcore-explorers": "^1.0.1",
     "bitcore-lib": "^0.15.0",
     "browserify": "^16.2.2",
+    "jsonwebtoken": "^8.3.0",
     "kcors": "^2.2.1",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
@@ -31,8 +34,7 @@
     "request": "^2.87.0",
     "mysql2": "^1.5.3",
     "nodemailer": "^4.6.7",
-    "sequelize": "^4.38.0",
-    "sequelize-cli": "^4.0.0"
+    "sequelize": "^4.38.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -40,6 +42,7 @@
     "jest": "^23.2.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
-    "sinon": "^6.0.0"
+    "sinon": "^6.0.0",
+    "sequelize-cli": "^4.0.0"
   }
 }

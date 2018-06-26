@@ -2,7 +2,7 @@
 
 const wallet = require('../../services/wallet');
 const mocks = require('../__mocks__/wallets');
-const request = require('../../utils/helperFunctions/request');
+const request = require('../../services/request');
 
 describe('createWallet', () => {
   it('Returns an object with 3 properties', () => {

@@ -3,7 +3,7 @@ delete global._bitcore; // workaround to resolve double instance of bitcore-lib
 const Insight = require('bitcore-explorers').Insight;
 const insight = new Insight('testnet');
 
-const promisify = require('../utils/helperFunctions/promisify')
+const promisify = require('../services/promisify')
 const bitcoinNet = process.env.BITCOIN_NET || 'testnet';
 
 /**

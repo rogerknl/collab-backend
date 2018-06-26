@@ -1,23 +1,17 @@
 'use strict';
-
-const db = require(__dirname + '/../db/sequelize');
-
-const Addressbook = db.sequelize.define('ADDRESSBOOK', {
-  id: {
-    type: db.Sequelize.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    unique: true,
-    primaryKey: true
-  },
-  publickey: {
-    type: db.Sequelize.STRING,
-    allowNull: false
-  },
-  name: {
-    type: db.Sequelize.STRING,
-    allowNull: false
-  },
-});
-
-module.exports = Addressbook;
+module.exports = (sequelize, DataTypes) => {
+  var AddressBook = sequelize.define('AddressBook', {
+    publickey: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+  }, {});
+  AddressBook.associate = function(models) {
+    // associations can be defined here
+  };
+  return AddressBook;
+};

@@ -1,21 +1,26 @@
 'use strict';
-const db = require(__dirname + '/../db/sequelize');
+module.exports = (sequelize, DataTypes) => {
+  var Wallet = sequelize.define('Wallet', {
+    publickey: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      primaryKey: true
+    },
+    privatekey: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    wif: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  }, {});
+  Wallet.associate = function(models) {
+    Wallet.hasMany(models.AddressBook);
+    Wallet.hasMany(models.Transaction);
+    Wallet.belongsToMany(models.User, { through: 'UserWallet' });
 
-const Wallet = db.sequelize.define('WALLET', {
-  publickey: {
-    type: db.Sequelize.STRING,
-    allowNull: false,
-    unique: true,
-    primaryKey: true
-  },
-  privatekey: {
-    type: db.Sequelize.STRING,
-    allowNull: false
-  },
-  wif: {
-    type: db.Sequelize.STRING,
-    allowNull: false
-  }
-});
-
-module.exports = Wallet;
+  };
+  return Wallet;
+};

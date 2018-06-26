@@ -1,10 +1,18 @@
 'use strict';
-const db = require(__dirname + '/../db/sequelize');
-
-
-
-const UserWallet = db.sequelize.define('USER_WALLET', {
-
-});
-
-module.exports = UserWallet;
+module.exports = (sequelize, DataTypes) => {
+  var UserWallet = sequelize.define('UserWallet', {
+    user_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    wallet_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+  }, {});
+  UserWallet.associate = function(models) {
+    UserWallet.hasMany(models.Operation);
+    UserWallet.hasMany(models.Vote);
+  };
+  return UserWallet;
+};

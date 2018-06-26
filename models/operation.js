@@ -1,31 +1,26 @@
 'use strict';
-
-const db = require(__dirname + '/../db/sequelize');
-
-const Operation = db.sequelize.define('OPERATION', {
-  id: {
-    type: db.Sequelize.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    unique: true,
-    primaryKey: true
-  },
-  target: {
-    type: db.Sequelize.STRING,
-    allowNull: false
-  },
-  amount: {
-    type: db.Sequelize.DECIMAL(18,9),
-    allowNull: false
-  },
-  message: {
-    type: db.Sequelize.STRING,
-    allowNull: false
-  },
-  result: {
-    type: db.Sequelize.STRING,
-    allowNull: false,
-    defaultValue: 'pending'
-  }
-});
-module.exports = Operation;
+module.exports = (sequelize, DataTypes) => {
+  var Operation = sequelize.define('Operation', {
+    target: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    amount: {
+      type: DataTypes.DECIMAL(18,9),
+      allowNull: false
+    },
+    message: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    result: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'pending'
+    }
+  }, {});
+  Operation.associate = function(models) {
+    Operation.hasMany(models.Transaction);
+  };
+  return Operation;
+};

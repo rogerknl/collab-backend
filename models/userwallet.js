@@ -2,11 +2,11 @@
 module.exports = (sequelize, DataTypes) => {
   var UserWallet = sequelize.define('UserWallet', {
     user_id: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     wallet_id: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   }, {});

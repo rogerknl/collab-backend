@@ -8,6 +8,6 @@ const userCont = require( __dirname + '/controllers/userController' );
 router
   .get('/', (ctx,next)=>ctx.body = "hello world")
   .get('/user', userCont.getAllUsers)
-  .post('/user',userCont.createUser);
+  .post('/register',userCont.createUser);
 
 module.exports = router;

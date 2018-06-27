@@ -25,9 +25,11 @@ exports.createWallet = async (ctx, next) => {
          db.UserWallet.create({
            user_id: user.dataValues.id,
            wallet_id: wallet.dataValues.publickey
-         }).then(()=>resolve('DONE'));
+         }).then(()=>resolve('DONE'))
+          .catch((err)=>reject(err));
        });
    });
   })
+  ctx.jwt.modified = true;
   ctx.body = {result};
 };

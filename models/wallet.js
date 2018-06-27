@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   Wallet.associate = function(models) {
     Wallet.hasMany(models.AddressBook);
     Wallet.hasMany(models.Transaction);
-    Wallet.hasMany(models.UserWallet);
+    // Wallet.hasMany(models.UserWallet);
   };
   return Wallet;
 };

@@ -23,10 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     publickey: {
       type: DataTypes.STRING,
       allowNull: true,
-      },
+    },
   }, {});
   User.associate = function(models) {
-    User.belongsToMany(models.Wallet, { through: 'UserWallet' });
+    User.hasMany(models.UserWallet);
   };
   return User;
 };

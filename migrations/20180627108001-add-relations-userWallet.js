@@ -34,6 +34,7 @@ module.exports = {
       return queryInterface.removeColumn(
         'UserWallets',
         'user_id'
-    )});
+      );
+    });
   }
 };

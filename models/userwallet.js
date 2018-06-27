@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
   UserWallet.associate = function(models) {
     UserWallet.hasMany(models.Operation);
     UserWallet.hasMany(models.Vote);
+    UserWallet.belongsTo(models.Wallet,{foreignKey: 'wallet_id', targetKey:'publickey'});
+    UserWallet.belongsTo(models.User,{foreignKey: 'user_id', sourceKey: 'id'});
   };
   return UserWallet;
 };

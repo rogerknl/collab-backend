@@ -24,7 +24,6 @@ const jWToken = async (ctx, next) => {
       expiresIn: 3600
     }));
   }
-
 };
 
 module.exports = jWToken;

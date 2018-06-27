@@ -1,25 +1,57 @@
 const wallet = require (__dirname + '/../services/wallet');
 
+
 const db = require (__dirname + '/../models/');
 
-exports.getWallets = async (ctx) => {
 
+exports.usersOfWallet = async ( pk ) => {
+  let result = await new Promise((resolve,reject) => {
+    db.User.findAll({
+      include: [{
+        model: db.UserWallet,
+        where: {
+          wallet_id: pk
+        }
+      }]
+    }).then((users)=>{
+      resolve(users.map((el)=>{
+        return {
+          'username': el.username
+        };
+      }));
+    }).catch((err)=>reject(err));
+  });
+  return result;
+};
+
+exports.getWallets = async (ctx) => {
   let result = await new Promise((resolve,reject)=>{
     db.User.findOne(
       { where: {username:ctx.user.username},
         attributes: ['id']
       }
     ).then((user)=>{
-      db.UserWallet.findAll({
-        where: {
-          user_id: user.dataValues.id
-        },
-        attributes: ['wallet_id']
+      db.Wallet.findAll({
+        include: [{
+          model: db.UserWallet,
+          where: {
+            user_id: user.dataValues.id
+          }
+        }]
       }).then((wallets)=>{
-        resolve(wallets.map(el=>el.wallet_id));
+        resolve(wallets.map((el)=>{
+          return {
+            'alias': el.alias,
+            'publickey': el.publickey
+          };
+        }));
       }).catch((err)=>reject(err));
     });
   });
+  for( let auxWallet of  result ) {
+    auxWallet.balance = await wallet.getWalletBalance(auxWallet.publickey);
+    auxWallet.users = await this.usersOfWallet( auxWallet.publickey );
+  }
   ctx.jwt.modified = true;
   ctx.body = {wallets:result};
 };

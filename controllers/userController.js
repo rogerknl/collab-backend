@@ -5,13 +5,13 @@ const atob = require('atob');
 const db = require( __dirname + '/../models/' );
 const filterProps = require('../services/utils').filterProps;
 
-exports.getAllUsers = async ctx => {
+exports.getAllUsers = async () => {
   // ctx.body= await db.User.findAll({attributes: ['username', 'password']})
   // (ctx.body = await dbAccess.getAllUsers())
 };
 
 
-module.exports.signIn = async (ctx, next) => {
+module.exports.signIn = async (ctx) => {
   const auth = ctx.request.headers.authorization.split(' ');
   const decoded = atob(auth[1]).split(/:(.+)/);
   let user = await db.User.findOne({where: {username:decoded[0]}});
@@ -44,7 +44,7 @@ exports.createUser = async (ctx, next) => {
     user['password'] = await bcrypt.hash(user.password, salt)
       .then((hash) => hash);
     await db.User.create(user);
-    ctx.body = { username: userData.username, email:userData.email}
+    ctx.body = { username: userData.username, email:userData.email };
     ctx.user = { username: userData.username};
     ctx.jwt.modified = true;
     ctx.status = 201;

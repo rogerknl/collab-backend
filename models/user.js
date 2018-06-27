@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     publickey: {
       type: DataTypes.STRING,
       allowNull: true,
-      },
+    },
   }, {});
   User.associate = function(models) {
     User.hasMany(models.UserWallet);

@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
     Wallet.hasMany(models.AddressBook);
     Wallet.hasMany(models.Transaction);
     Wallet.hasMany(models.UserWallet);
-
   };
   return Wallet;
 };

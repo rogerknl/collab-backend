@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken');
 const jWToken = async (ctx, next) => {
   ctx.jwt = {};
   ctx.jwt['modified'] = false;
-  console.log(ctx.url)
+
   if (!ctx.request.headers.authorization && ctx.url !== '/register') return await next();
   if ( ctx.request.headers.authorization ){
     const auth = ctx.request.headers.authorization.split(' ');

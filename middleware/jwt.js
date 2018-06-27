@@ -20,18 +20,9 @@ const jWToken = async (ctx, next) => {
 
 
   if (ctx.jwt.modified) {
-    if (!ctx.body) ctx.body = {
-      Token: jwt.sign(ctx.user, 'SecretFTW!', {
-        expiresIn: 3600
-      })
-    };
-    else{
-      Object.assign(ctx.body, {
-        Token: jwt.sign(ctx.user, 'SecretFTW!', {
-          expiresIn: 3600
-        })
-      });
-    }
+    ctx.set('x-token',jwt.sign(ctx.user, 'SecretFTW!', {
+      expiresIn: 3600
+    }));
   }
 
 };

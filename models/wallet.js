@@ -21,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   Wallet.associate = function(models) {
-    Wallet.hasMany(models.AddressBook);
-    Wallet.hasMany(models.Transaction);
+    Wallet.hasMany(models.AddressBook,{foreignKey: 'wallet_id', sourceKey: 'publickey'});
+    Wallet.hasMany(models.Transaction,{foreignKey: 'wallet_id', sourceKey: 'publickey'});
     Wallet.hasMany(models.UserWallet,{foreignKey: 'wallet_id', sourceKey: 'publickey'});
   };
   return Wallet;

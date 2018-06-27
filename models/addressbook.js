@@ -9,9 +9,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    wallet_id: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
   }, {});
   AddressBook.associate = function(models) {
-    // associations can be defined here
+    AddressBook.belongsTo(models.Wallet,{foreignKey: 'wallet_id', targetKey: 'publickey'});
   };
   return AddressBook;
 };

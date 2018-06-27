@@ -16,10 +16,20 @@ module.exports = (sequelize, DataTypes) => {
     transaction_str: {
       type: DataTypes.STRING,
       allowNull: false
-    }
+    },
+    operation_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    wallet_id: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
   }, {});
   Transaction.associate = function(models) {
-    // associations can be defined here
+    Transaction.belongsTo(models.Wallet,{foreignKey: 'wallet_id', targetKey:'publickey'});
+    Transaction.belongsTo(models.Operation,{foreignKey: 'operation_id', targetKey:'id'});
   };
   return Transaction;
 };

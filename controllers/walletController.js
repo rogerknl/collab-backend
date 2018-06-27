@@ -26,6 +26,7 @@ exports.getWallets = async (ctx) => {
 
 exports.createWallet = async (ctx) => {
   const newWallet = wallet.createWallet();
+  if (!ctx.request.body.alias) return ctx.body = {ERROR: 'Missing alias'};
 
   let result = await new Promise((resolve,reject)=>{
     db.User.findOne(
@@ -36,7 +37,8 @@ exports.createWallet = async (ctx) => {
       db.Wallet.create({
         publickey: newWallet.address,
         privatekey: newWallet.privateKey,
-        wif: newWallet.privateKeyWIF
+        wif: newWallet.privateKeyWIF,
+        alias: ctx.request.body.alias
       })
         .then((wallet)=>{
           db.UserWallet.create({

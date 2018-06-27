@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
     wif: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    alias: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
   }, {});
   Wallet.associate = function(models) {

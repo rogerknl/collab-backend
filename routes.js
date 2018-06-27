@@ -6,6 +6,7 @@ const userCont = require( __dirname + '/controllers/userController' );
 const walletCont = require( __dirname + '/controllers/walletController' );
 
 router
+  .get('/wallet', authorize, walletCont.getWallets)
   .post('/wallet', authorize, walletCont.createWallet)
   .post('/login', userCont.signIn)
   .post('/register',userCont.createUser);

@@ -16,9 +16,11 @@ const sequelize = new Sequelize( process.env.DB_NAME, process.env.DB_USER, proce
 sequelize
   .authenticate()
   .then(() => {
+    // eslint-disable-next-line
     console.log('Connection has been established successfully.');
   })
   .catch(err => {
+    // eslint-disable-next-line
     console.error('Unable to connect to the database:', err);
   });
 

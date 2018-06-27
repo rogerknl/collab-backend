@@ -5,11 +5,6 @@ const atob = require('atob');
 const db = require( __dirname + '/../models/' );
 const filterProps = require('../services/utils').filterProps;
 
-exports.getAllUsers = async () => {
-  // ctx.body= await db.User.findAll({attributes: ['username', 'password']})
-  // (ctx.body = await dbAccess.getAllUsers())
-};
-
 
 module.exports.signIn = async (ctx) => {
   const auth = ctx.request.headers.authorization.split(' ');

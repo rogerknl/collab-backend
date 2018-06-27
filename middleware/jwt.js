@@ -18,17 +18,17 @@ const jWToken = async (ctx, next) => {
     }
   } else await next();
 
+
   if (ctx.jwt.modified) {
     if (!ctx.body) ctx.body = {
       Token: jwt.sign(ctx.user, 'SecretFTW!', {
-        expiresIn: 60
+        expiresIn: 3600
       })
     };
     else{
-      console.log(ctx.body)
       Object.assign(ctx.body, {
         Token: jwt.sign(ctx.user, 'SecretFTW!', {
-          expiresIn: 60
+          expiresIn: 3600
         })
       });
       console.log('ass',ctx.body)

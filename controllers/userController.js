@@ -14,9 +14,6 @@ exports.getAllUsers = async ctx => {
 module.exports.signIn = async (ctx, next) => {
   const auth = ctx.request.headers.authorization.split(' ');
   const decoded = atob(auth[1]).split(/:(.+)/);
-
-  console.log(decoded)
-
   let user = await db.User.findOne({where: {username:decoded[0]}});
   if (user) {
     const match = await bcrypt.compare(decoded[1], user.password);

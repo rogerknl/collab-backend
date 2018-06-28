@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Vote = sequelize.define('Vote', {
-    value: DataTypes.STRING,
+    value: DataTypes.INTEGER,
     userwallet_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -4,6 +4,45 @@ const sendMail = require(__dirname + '/../services/mailer');
 const db = require( __dirname + '/../models/' );
 
 
+module.exports.getOperation = async (ctx) => {
+  //get de UserAuth Id
+  const userId = await db.User.findOne({ where:
+    { username:ctx.user.username},
+  attributes: ['id']
+  });
+
+  //get all votes of this operation
+  const votes = await db.UserWallet.findAll({
+    include: [{
+      model: db.Vote,
+      where: {
+        operation_id: ctx.params.operation_id
+      }
+    }]
+  });
+  let userHasRights = false;
+  let numberOfUsers = votes.length;
+  let numberOfVotes = 0;
+  let valueOfVote = 0;
+  for (let el of votes) {
+    if (el.user_id === userId.id){
+      userHasRights = true;
+      if (el.Votes[0].value) valueOfVote = el.Votes[0].value;
+    }
+    else if(el.Votes[0].value) numberOfVotes++;
+  }
+  if (!userHasRights) ctx.body = {error: 'User has no rights over this operation '};
+
+  //get info of this operation
+  const operation = await db.Operation.findOne({where:
+    {id:ctx.params.operation_id},
+  attributes: ['target','amount','message','result']
+  });
+
+  //send the info to the frontend
+  ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote};
+};
+
 module.exports.createVotes = async (ctx, opId, wId, opMsg) => {
   let error = false;
   let uwIds = await db.UserWallet.findAll({where:

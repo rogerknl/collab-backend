@@ -28,7 +28,7 @@ module.exports.readyToVote = (user,msg) => {
     from: process.env.EMAIL_USER,
     to: user.email,
     subject: 'A new operation is waiting your vote',
-    html: `<h1>New operation:</h1><br/><h2>${msg}</h2<p>We are waiting for your vote: ¯\\_(ツ)_/¯</p>`
+    html: `<h1>New operation:</h1><h2>${msg}</h2><br/><p>We are waiting for your vote: ¯\\_(ツ)_/¯</p>`
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){

@@ -1,8 +1,69 @@
 'use strict';
 const sendMail = require(__dirname + '/../services/mailer');
-
+const wallet = require(__dirname + '/../services/wallet');
 const db = require( __dirname + '/../models/' );
 
+//
+//makeTransaction = async (
+//  emisor, privateKey, receptor, amount, fee
+
+
+module.exports.executeOperation = async ( oId, votes) => {
+  const operation = await db.Operation.findOne({where:
+  { id: oId}
+  });
+  const result = await operation.updateAttributes({
+    result: 'Approved'
+  });
+  if (result) {
+    const uw = await db.UserWallet.findOne({ where:
+      {id: result.dataValues.userwallet_id}
+    });
+    const w = await db.Wallet.findOne({ where:
+      {publickey: uw.dataValues.wallet_id}
+    });
+    let txRes = await wallet.makeTransaction(
+      w.dataValues.publickey,
+      w.dataValues.privatekey,
+      operation.dataValues.target,
+      operation.dataValues.amount
+    );
+    for (let vote of votes){
+      const user = await db.User.findOne({
+        include: [{
+          model: db.UserWallet,
+          where: {
+            id: vote.dataValues.userwallet_id
+          }
+        }]
+      });
+      if (txRes) sendMail.operationApproved(user.dataValues.email,operation.dataValues.message);
+      else sendMail.operationApprovedButfailed(user.dataValues.email,operation.dataValues.message);
+    }
+  }
+};
+
+module.exports.rejectOperation = async ( oId, votes) => {
+  const operation = await db.Operation.findOne({where:
+  { id: oId}
+  });
+  const result = await operation.updateAttributes({
+    result: 'Rejected'
+  });
+  if (result) {
+    for (let vote of votes){
+      const user = await db.User.findOne({
+        include: [{
+          model: db.UserWallet,
+          where: {
+            id: vote.dataValues.userwallet_id
+          }
+        }]
+      });
+      sendMail.opearionRejected(user.dataValues.email,operation.dataValues.message);
+    }
+  }
+};
 
 module.exports.getOperation = async (ctx) => {
   //get de UserAuth Id

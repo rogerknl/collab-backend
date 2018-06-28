@@ -36,7 +36,6 @@ exports.addUserToWallet = async (ctx) => {
       attributes: ['id']
     }
   );
-
   //check if userAuth has rights over this wallet
   const uWauth = await db.UserWallet.findOne({
     where: {user_id: userAuth.id, wallet_id: ctx.request.body.publickey}

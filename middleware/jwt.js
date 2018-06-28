@@ -3,7 +3,6 @@ var jwt = require('jsonwebtoken');
 const jWToken = async (ctx, next) => {
   ctx.jwt = {};
   ctx.jwt['modified'] = false;
-
   if (!ctx.request.headers.authorization && ctx.url !== '/register') return await next();
   if ( ctx.request.headers.authorization ){
     const auth = ctx.request.headers.authorization.split(' ');
@@ -20,9 +19,16 @@ const jWToken = async (ctx, next) => {
 
 
   if (ctx.jwt.modified) {
-    ctx.set('x-token',jwt.sign(ctx.user, 'SecretFTW!', {
+    const token = jwt.sign(ctx.user, 'SecretFTW!', {
       expiresIn: 3600
-    }));
+    });
+
+    ctx.set('x-token',token);
+    if (!ctx.body) {
+      ctx.body = {'jwt':token};
+    } else {
+      Object.assign(ctx.body, {'jwt':token});
+    }
   }
 };
 

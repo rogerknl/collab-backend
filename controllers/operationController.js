@@ -13,14 +13,9 @@ const filterProps = require('../services/utils').filterProps;
 }
 */
 module.exports.createOperation = async (ctx) => {
-  let result = await new Promise((resolve,reject)=>{
-    db.User.findOne(
-      { where: {username:ctx.user.username},
-        attributes: ['id']
-      }
-    ).then((user)=>{
-      resolve(user);
-    });
+  let userId = await db.User.findOne({ where:
+  { username:ctx.user.username},
+  attributes: ['id']
   });
-  ctx.body = result;
+  ctx.body = userId;
 };

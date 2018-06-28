@@ -16,6 +16,7 @@ module.exports.signIn = async (ctx) => {
       ctx.user = {};
       ctx.user['username'] = user.username;
       ctx.jwt.modified = true;
+      ctx.body = {username: user.username, email: user.email, firstname: user.firstname };
       ctx.status = 200;
     } else ctx.status = 401;
   } else ctx.status = 401;

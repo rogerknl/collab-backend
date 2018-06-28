@@ -11,10 +11,10 @@ require('dotenv').config();
 const router = require(__dirname+'/routes.js');
 
 app
-  .use(errorHand)
-  .use(jwt)
   .use(logger())
   .use(cors())
+  .use(errorHand)
+  .use(jwt)
   .use(bodyParser())
   .use(router.routes())
   .use(router.allowedMethods());

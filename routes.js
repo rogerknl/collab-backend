@@ -8,6 +8,7 @@ const userWalletCont = require( __dirname + '/controllers/userWalletController' 
 const operCont = require( __dirname + '/controllers/operationController' );
 
 router
+  .get('/vote/',(ctx)=>{ctx.body='hello world';})
   .get('/wallet', authorize, walletCont.getWallets)
   .post('/wallet/add_user',authorize, userWalletCont.addUserToWallet)
   .post('/operations', authorize, operCont.createOperation)

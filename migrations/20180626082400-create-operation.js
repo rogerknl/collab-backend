@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false
       },
       amount: {
-        type: Sequelize.DECIMAL(18,9),
+        type: Sequelize.INTEGER,
         allowNull: false
       },
       message: {

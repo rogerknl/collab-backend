@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     amount: {
-      type: DataTypes.DECIMAL(18,9),
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     message: {

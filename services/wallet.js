@@ -18,16 +18,16 @@ const bitcoinNet = process.env.BITCOIN_NET || 'testnet';
  */
 
 module.exports.createWallet = () => {
- const privateKeyWIF = bitcore.PrivateKey(bitcoinNet).toWIF();
- const privateKey = bitcore.PrivateKey.fromWIF(privateKeyWIF);
- const address = privateKey.toAddress();
+  const privateKeyWIF = bitcore.PrivateKey(bitcoinNet).toWIF();
+  const privateKey = bitcore.PrivateKey.fromWIF(privateKeyWIF);
+  const address = privateKey.toAddress();
 
- return {
-   address: address.toString(),
-   privateKey: privateKey.toString(),
-   privateKeyWIF: privateKeyWIF.toString()
- }
-}
+  return {
+    address: address.toString(),
+    privateKey: privateKey.toString(),
+    privateKeyWIF: privateKeyWIF.toString()
+  };
+};
 
 /**
  * Get the total amount of satoshis available in the wallet.
@@ -41,15 +41,15 @@ module.exports.createWallet = () => {
  */
 
 module.exports.getWalletBalance = async (emisor) => {
- try {
-   insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
-   const utxos = await insight.getUnspentUtxosPromise(emisor);
+  try {
+    insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
+    const utxos = await insight.getUnspentUtxosPromise(emisor);
 
-   return utxos.reduce((acc,utxo) => acc + utxo.satoshis, 0)
- } catch (e) {
-   console.error(e);
- }
-}
+    return utxos.reduce((acc,utxo) => acc + utxo.satoshis, 0);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 /**
  * Get the Unspent Transaction Outputs of the wallet.
@@ -63,15 +63,15 @@ module.exports.getWalletBalance = async (emisor) => {
  */
 
 module.exports.getUTXOS = async (emisor) => {
- try {
-   insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
-   const utxos = await insight.getUnspentUtxosPromise(emisor);
+  try {
+    insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
+    const utxos = await insight.getUnspentUtxosPromise(emisor);
 
-   return utxos
- } catch (e) {
-   console.error(e);
- }
-}
+    return utxos;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 /**
  * Make a transaction between to addresses.
@@ -95,20 +95,20 @@ module.exports.getUTXOS = async (emisor) => {
 
 module.exports.makeTransaction = async (
   emisor, privateKey, receptor, amount, fee = process.env.BITCOIN_MINER_FEE || 1000) => {
- try {
-   insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
-   insight.broadcastPromise = promisify(insight, insight.broadcast);
-   const utxos = await insight.getUnspentUtxosPromise(emisor);
-   const tx = bitcore.Transaction();
-   tx.from(utxos);
-   tx.to(receptor, amount);
-   tx.change(emisor);
-   tx.fee(fee)
-   tx.sign(privateKey)
-   tx.serialize()
+  try {
+    insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
+    insight.broadcastPromise = promisify(insight, insight.broadcast);
+    const utxos = await insight.getUnspentUtxosPromise(emisor);
+    const tx = bitcore.Transaction();
+    tx.from(utxos);
+    tx.to(receptor, amount);
+    tx.change(emisor);
+    tx.fee(fee)
+    tx.sign(privateKey)
+    tx.serialize()
 
-   return insight.broadcastPromise(tx.serialize());
- } catch (e) {
-   console.error(e);
- }
-}
+    return insight.broadcastPromise(tx.serialize());
+  } catch (e) {
+    console.error(e);
+  }
+};

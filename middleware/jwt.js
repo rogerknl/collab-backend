@@ -20,7 +20,7 @@ const jWToken = async (ctx, next) => {
 
   if (ctx.jwt.modified) {
     const token = jwt.sign(ctx.user, 'SecretFTW!', {
-      expiresIn: 3600
+      expiresIn: 86400
     });
 
     ctx.set('x-token',token);

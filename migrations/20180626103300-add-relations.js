@@ -12,19 +12,19 @@ module.exports = {
         }
       }
     )
-    .then(()=> {
-      return queryInterface.addColumn(
-        'Transactions',
-        'wallet_id',
-        {
-          type: Sequelize.STRING,
-          references: {
-            model: 'Wallets',
-            key: 'publickey',
+      .then(()=> {
+        return queryInterface.addColumn(
+          'Transactions',
+          'wallet_id',
+          {
+            type: Sequelize.STRING,
+            references: {
+              model: 'Wallets',
+              key: 'publickey',
+            }
           }
-        }
-      );
-    });
+        );
+      });
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(

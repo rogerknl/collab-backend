@@ -1,4 +1,5 @@
 var jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const jWToken = async (ctx, next) => {
   ctx.jwt = {};
@@ -9,7 +10,7 @@ const jWToken = async (ctx, next) => {
     if (auth[0] !== 'Bearer') {
       await next();
     } else {
-      let decoded = jwt.verify(auth[1], 'SecretFTW!');
+      let decoded = jwt.verify(auth[1], process.env.JWT_SECRET);
       ctx.user = {
         username: decoded.username
       };
@@ -19,7 +20,7 @@ const jWToken = async (ctx, next) => {
 
 
   if (ctx.jwt.modified) {
-    const token = jwt.sign(ctx.user, 'SecretFTW!', {
+    const token = jwt.sign(ctx.user, process.env.JWT_SECRET, {
       expiresIn: 86400
     });
 

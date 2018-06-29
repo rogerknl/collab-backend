@@ -23,7 +23,8 @@ exports.getWallets = async (ctx) => {
     (el)=>{
       return {
         'alias': el.alias,
-        'publickey': el.publickey
+        'publickey': el.publickey,
+        'createdAt': el.createdAt
       };
     });
   for( let auxWallet of  result ) {

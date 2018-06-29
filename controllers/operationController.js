@@ -10,7 +10,8 @@ module.exports.executeOperation = async ( oId, votes) => {
   { id: oId}
   });
   const result = await operation.updateAttributes({
-    result: 'Approved'
+    result: 'Approved',
+    closed_at: Date.now()
   });
   if (result) {
     const uw = await db.UserWallet.findOne({ where:
@@ -45,7 +46,8 @@ module.exports.rejectOperation = async ( oId, votes) => {
   { id: oId}
   });
   const result = await operation.updateAttributes({
-    result: 'Rejected'
+    result: 'Rejected',
+    closed_at: Date.now()
   });
   if (result) {
     for (let vote of votes){
@@ -102,7 +104,7 @@ module.exports.getOperationHistoryWid = async (ctx) => {
       result: operation.dataValues.result,
       operation_id: operation.dataValues.id,
       votingState: votingState,
-      closedAt: operation.updatedAt
+      closed_at: operation.closed_at
     };
     result.push(pendingOp);
   }
@@ -155,7 +157,8 @@ module.exports.getOperationHistory = async (ctx) => {
       operation_id: operation.dataValues.id,
       votingState: votingState,
       numberOfVotes: numberOfVotes,
-      numberOfUsers: operation.dataValues.Votes.length
+      numberOfUsers: operation.dataValues.Votes.length,
+      closed_at: operation.closed_at
     };
     result.push(pendingOp);
   }

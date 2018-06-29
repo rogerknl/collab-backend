@@ -12,6 +12,7 @@ router
   .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)
   .get('/operations/history', authorize, operCont.getOperationHistory)
+  .get('/operations/history/:wallet_id', authorize, operCont.getOperationHistoryWid)
   .get('/operations/:operation_id',authorize, operCont.getOperation)
   .post('/vote', authorize, voteCont.vote)
   .post('/wallet/add_user',authorize, userWalletCont.addUserToWallet)

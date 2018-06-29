@@ -8,6 +8,8 @@ const userWalletCont = require( __dirname + '/controllers/userWalletController' 
 const operCont = require( __dirname + '/controllers/operationController' );
 const voteCont = require( __dirname + '/controllers/voteController' );
 
+
+
 router
   .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)

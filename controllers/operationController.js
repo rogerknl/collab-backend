@@ -3,7 +3,7 @@ const sendMail = require(__dirname + '/../services/mailer');
 const wallet = require(__dirname + '/../services/wallet');
 const db = require( __dirname + '/../models/' );
 
-
+const cryptoSer = require( __dirname + '/../services/cryptoSer');
 
 module.exports.executeOperation = async ( oId, votes) => {
   const operation = await db.Operation.findOne({where:
@@ -22,7 +22,7 @@ module.exports.executeOperation = async ( oId, votes) => {
     });
     let txRes = await wallet.makeTransaction(
       w.dataValues.publickey,
-      w.dataValues.privatekey,
+      cryptoSer.decryptIv(w.dataValues.privatekey),
       operation.dataValues.target,
       operation.dataValues.amount
     );

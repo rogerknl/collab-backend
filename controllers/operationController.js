@@ -108,6 +108,7 @@ module.exports.getOperationHistoryWid = async (ctx) => {
     };
     result.push(pendingOp);
   }
+  ctx.jwt.modified = true;
   ctx.body = result;
 };
 
@@ -162,6 +163,7 @@ module.exports.getOperationHistory = async (ctx) => {
     };
     result.push(pendingOp);
   }
+  ctx.jwt.modified = true;
   ctx.body = result;
 };
 
@@ -201,6 +203,7 @@ module.exports.getOperation = async (ctx) => {
   });
 
   //send the info to the frontend
+  ctx.jwt.modified = true;
   ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote};
 };
 
@@ -245,7 +248,9 @@ module.exports.createOperation = async (ctx) => {
   if (!operation) return ctx.body = {error: 'DB error on inserting'};
   //create all votes for this operation
   let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message);
-  if (!error) return ctx.body = {msg: 'Operation and votes created'};
-
+  if (!error){
+    ctx.jwt.modified = true;
+    return ctx.body = {msg: 'Operation and votes created'};
+  }
   ctx.body = {error: 'DB error on inserting votes'};
 };

@@ -1,23 +1,19 @@
 
 const db = require (__dirname + '/../models/');
 
-
 exports.usersOfWallet = async ( publickey ) => {
-  let result = await new Promise((resolve,reject) => {
-    db.User.findAll({
-      include: [{
-        model: db.UserWallet,
-        where: {
-          wallet_id: publickey
-        }
-      }]
-    }).then((users)=>{
-      resolve(users.map((el)=>{
-        return {
-          'username': el.username
-        };
-      }));
-    }).catch((err)=>reject(err));
+  const users = await db.User.findAll({
+    include: [{
+      model: db.UserWallet,
+      where: {
+        wallet_id: publickey
+      }
+    }]
+  });
+  const result = users.map((el)=>{
+    return {
+      'username': el.username
+    };
   });
   return result;
 };
@@ -53,6 +49,10 @@ exports.addUserToWallet = async (ctx) => {
     user_id: userToAdd.id,
     wallet_id: ctx.request.body.publickey
   });
-  if(result) return 'DONE';
+  if(result){
+    ctx.jwt.modified = true;
+    return ctx.body = 'DONE';
+  }
+
   ctx.body = {error: 'DB error on inserting'};
 };

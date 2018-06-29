@@ -10,7 +10,8 @@ module.exports.executeOperation = async ( oId, votes) => {
   { id: oId}
   });
   const result = await operation.updateAttributes({
-    result: 'Approved'
+    result: 'Approved',
+    closed_at: Date.now()
   });
   if (result) {
     const uw = await db.UserWallet.findOne({ where:
@@ -45,7 +46,8 @@ module.exports.rejectOperation = async ( oId, votes) => {
   { id: oId}
   });
   const result = await operation.updateAttributes({
-    result: 'Rejected'
+    result: 'Rejected',
+    closed_at: Date.now()
   });
   if (result) {
     for (let vote of votes){
@@ -61,6 +63,55 @@ module.exports.rejectOperation = async ( oId, votes) => {
     }
   }
 };
+
+module.exports.getOperationHistoryWid = async (ctx) => {
+  const uw = await db.User.findOne({where:
+    {username: ctx.user.username},
+  include: [
+    {
+      model: db.UserWallet,
+      where: {wallet_id: ctx.params.wallet_id},
+    }
+  ]
+  });
+  if (!uw) return ctx.body = {error: 'User has no right over this wallet'};
+
+
+  const operations = await db.Operation.findAll({
+    where: {
+      $or:[
+        {result: 'Approved'},
+        {result: 'Rejected'}
+      ]},
+    include: [
+      {
+        model: db.Vote,
+        where: {
+          userwallet_id: uw.dataValues.UserWallets[0].dataValues.id,
+        }
+      }
+    ]
+  });
+  let result =[];
+  for (let operation of operations) {
+    let votingState = 0;
+    if (operation.dataValues.Votes[0].dataValues.value) votingState = operation.dataValues.Votes[0].dataValues.value;
+    let pendingOp = {
+      publicKey: ctx.params.wallet_id,
+      message: operation.dataValues.message,
+      amount: operation.dataValues.amount,
+      target: operation.dataValues.target,
+      result: operation.dataValues.result,
+      operation_id: operation.dataValues.id,
+      votingState: votingState,
+      closed_at: operation.closed_at
+    };
+    result.push(pendingOp);
+  }
+  ctx.jwt.modified = true;
+  ctx.body = result;
+};
+
 
 module.exports.getOperationHistory = async (ctx) => {
   const operations = await db.Operation.findAll({
@@ -107,10 +158,12 @@ module.exports.getOperationHistory = async (ctx) => {
       operation_id: operation.dataValues.id,
       votingState: votingState,
       numberOfVotes: numberOfVotes,
-      numberOfUsers: operation.dataValues.Votes.length
+      numberOfUsers: operation.dataValues.Votes.length,
+      closed_at: operation.closed_at
     };
     result.push(pendingOp);
   }
+  ctx.jwt.modified = true;
   ctx.body = result;
 };
 
@@ -150,6 +203,7 @@ module.exports.getOperation = async (ctx) => {
   });
 
   //send the info to the frontend
+  ctx.jwt.modified = true;
   ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote};
 };
 
@@ -194,7 +248,9 @@ module.exports.createOperation = async (ctx) => {
   if (!operation) return ctx.body = {error: 'DB error on inserting'};
   //create all votes for this operation
   let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message);
-  if (!error) return ctx.body = {msg: 'Operation and votes created'};
-
+  if (!error){
+    ctx.jwt.modified = true;
+    return ctx.body = {msg: 'Operation and votes created'};
+  }
   ctx.body = {error: 'DB error on inserting votes'};
 };

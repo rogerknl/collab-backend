@@ -1,5 +1,6 @@
 const wallet = require (__dirname + '/../services/wallet');
 
+const cryptoSer = require( __dirname + '/../services/cryptoSer');
 const userWallet = require ( __dirname + '/userWalletController');
 const db = require (__dirname + '/../models/');
 
@@ -39,7 +40,6 @@ exports.getWallets = async (ctx) => {
 exports.createWallet = async (ctx) => {
   if (!ctx.request.body.alias) return ctx.body = {ERROR: 'Missing alias'};
   const newWallet = wallet.createWallet();
-
   const userId = await db.User.findOne(
     { where: {username:ctx.user.username},
       attributes: ['id']
@@ -47,7 +47,7 @@ exports.createWallet = async (ctx) => {
 
   const w = await db.Wallet.create({
     publickey: newWallet.address,
-    privatekey: newWallet.privateKey,
+    privatekey: cryptoSer.encryptIv(newWallet.privateKey),
     wif: newWallet.privateKeyWIF,
     alias: ctx.request.body.alias
   });

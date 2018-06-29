@@ -30,8 +30,9 @@
 delete global._bitcore; // workaround to resolve double instance of bitcore-lib
 const Insight = require('bitcore-explorers').Insight;
 const insight = new Insight('testnet');
+const request = require('../services/request');
 
-const promisify = require('../utils/helperFunctions/promisify')
+const promisify = require('../services/promisify');
 const bitcoinNet = process.env.BITCOIN_NET || 'testnet';
 
 /**
@@ -46,16 +47,16 @@ const bitcoinNet = process.env.BITCOIN_NET || 'testnet';
  */
 
 module.exports.createWallet = () => {
- const privateKeyWIF = bitcore.PrivateKey(bitcoinNet).toWIF();
- const privateKey = bitcore.PrivateKey.fromWIF(privateKeyWIF);
- const address = privateKey.toAddress();
+  const privateKeyWIF = bitcore.PrivateKey(bitcoinNet).toWIF();
+  const privateKey = bitcore.PrivateKey.fromWIF(privateKeyWIF);
+  const address = privateKey.toAddress();
 
- return {
-   address: address.toString(),
-   privateKey: privateKey.toString(),
-   privateKeyWIF: privateKeyWIF.toString()
- }
-}
+  return {
+    address: address.toString(),
+    privateKey: privateKey.toString(),
+    privateKeyWIF: privateKeyWIF.toString()
+  };
+};
 
 /**
  * Get the total amount of satoshis available in the wallet.
@@ -69,15 +70,15 @@ module.exports.createWallet = () => {
  */
 
 module.exports.getWalletBalance = async (emisor) => {
- try {
-   insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
-   const utxos = await insight.getUnspentUtxosPromise(emisor);
+  try {
+    insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
+    const utxos = await insight.getUnspentUtxosPromise(emisor);
 
-   return utxos.reduce((acc,utxo) => acc + utxo.satoshis, 0)
- } catch (e) {
-   console.error(e);
- }
-}
+    return utxos.reduce((acc,utxo) => acc + utxo.satoshis, 0);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 /**
  * Get the Unspent Transaction Outputs of the wallet.
@@ -91,15 +92,15 @@ module.exports.getWalletBalance = async (emisor) => {
  */
 
 module.exports.getUTXOS = async (emisor) => {
- try {
-   insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
-   const utxos = await insight.getUnspentUtxosPromise(emisor);
+  try {
+    insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
+    const utxos = await insight.getUnspentUtxosPromise(emisor);
 
-   return utxos
- } catch (e) {
-   console.error(e);
- }
-}
+    return utxos;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 /**
  * Make a transaction between to addresses.
@@ -123,23 +124,113 @@ module.exports.getUTXOS = async (emisor) => {
 
 module.exports.makeTransaction = async (
   emisor, privateKey, receptor, amount, fee = process.env.BITCOIN_MINER_FEE || 1000) => {
- try {
-   insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
-   insight.broadcastPromise = promisify(insight, insight.broadcast);
-   const utxos = await insight.getUnspentUtxosPromise(emisor);
-   const tx = bitcore.Transaction();
-   tx.from(utxos);
-   tx.to(receptor, amount);
-   tx.change(emisor);
-   tx.fee(fee)
-   tx.sign(privateKey)
-   tx.serialize()
+  try {
+    insight.getUnspentUtxosPromise = promisify(insight, insight.getUnspentUtxos);
+    insight.broadcastPromise = promisify(insight, insight.broadcast);
+    const utxos = await insight.getUnspentUtxosPromise(emisor);
+    const tx = bitcore.Transaction();
+    tx.from(utxos);
+    tx.to(receptor, amount);
+    tx.change(emisor);
+    tx.fee(fee);
+    tx.sign(privateKey);
+    tx.serialize();
 
-   return insight.broadcastPromise(tx.serialize());
- } catch (e) {
-   console.error(e);
- }
-}
+    return insight.broadcastPromise(tx.serialize());
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+/**
+ * Get all the transactions of an address.
+ *
+ * @async
+ * @function getTransactions
+ * @param {string} address - public address of sender.
+ * e.g. 'mxStSTMNtfeu3tWhw42yfK7M47768JSD2n'
+ * @return {Promise} - Promise that resolves in an array of objects, each representing
+ * a transaction. This object properties are:
+ *  direction &lt;str>: 'inbound' or 'outbound'
+ *  time &lt;number>: 1530022584000,
+ *  value &lt;number>: in satoshis
+ *  txid &lt;string>
+ */
+module.exports.getTransactions = async (address) => {
+  const netPath = bitcoinNet === 'testnet' ? 'BTCTEST' : 'BTC';
+  try {
+    const operations = [];
+
+    // Fetch inbound and outbound transactions
+    let sentTx = await request(`https://chain.so/api/v2/get_tx_spent/${netPath}/${address}`);
+    sentTx = JSON.parse(sentTx.body).data.txs;
+    let receivedTx = await request(`https://chain.so/api/v2/get_tx_received/${netPath}/${address}`);
+    receivedTx = JSON.parse(receivedTx.body).data.txs;
+
+    // Add 'direction' property and correct format time and properties for each transaction
+    sentTx.forEach(el => {
+      operations.push({
+        direction : 'outbound',
+        time : Number(String(el.time)+'000'),
+        value : (Number(el.value) * 100000000).toFixed(),
+        txid : el.txid,
+      });
+    });
+    receivedTx.forEach(el => {
+      operations.push({
+        direction : 'inbound',
+        time : Number(String(el.time)+'000'),
+        value : (Number(el.value) * 100000000).toFixed(),
+        txid : el.txid,
+      });
+    });
+
+    // Put all transactions in an array and sort them by time
+    operations.sort((a, b) => a.time - b.time);
+
+    // console.log(operations);
+    return operations;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+/**
+ * Get all inbound transactions of an address
+ *
+ * @async
+ * @function getInbTransactions
+ * @param {string} address - public address of sender.
+ * @param {string} fromTxid - Last transaction from which to show transactions.
+ * @return {Promise} - Promise that resolves in an array of objects, each representing
+ * a transaction. This object properties are:
+ *  time &lt;number>: 1530022584000,
+ *  value &lt;number>: in satoshis
+ *  txid &lt;string>
+ */
+module.exports.getInbTransactions = async (address, fromTxid = '') => {
+  const netPath = bitcoinNet === 'testnet' ? 'BTCTEST' : 'BTC';
+  try {
+    const operations = [];
+
+    // Fetch transactions
+    let receivedTx = await request(`https://chain.so/api/v2/get_tx_received/${netPath}/${address}/${fromTxid}`);
+    receivedTx = JSON.parse(receivedTx.body).data.txs;
+
+    // Correct format time and properties for each transaction
+    receivedTx.forEach(el => {
+      operations.push({
+        time : Number(String(el.time)+'000'),
+        value : (Number(el.value) * 100000000).toFixed(),
+        txid : el.txid,
+      });
+    });
+
+    return operations;
+  } catch (e) {
+    console.error(e);
+  }
+};
 </code></pre>
         </article>
     </section>
@@ -150,13 +241,13 @@ module.exports.makeTransaction = async (
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createWallet">createWallet</a></li><li><a href="global.html#getUTXOS">getUTXOS</a></li><li><a href="global.html#getWalletBalance">getWalletBalance</a></li><li><a href="global.html#makeTransaction">makeTransaction</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createWallet">createWallet</a></li><li><a href="global.html#getInbTransactions">getInbTransactions</a></li><li><a href="global.html#getTransactions">getTransactions</a></li><li><a href="global.html#getUTXOS">getUTXOS</a></li><li><a href="global.html#getWalletBalance">getWalletBalance</a></li><li><a href="global.html#makeTransaction">makeTransaction</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jun 26 2018 18:59:19 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 29 2018 17:27:41 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

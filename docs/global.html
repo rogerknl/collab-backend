@@ -159,7 +159,7 @@ To operate with real BTC in the livenet write BITCOIN_NET=livenet in .env file.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line9">line 9</a>
+        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -198,6 +198,353 @@ To operate with real BTC in the livenet write BITCOIN_NET=livenet in .env file.
     <dd>
         
 <span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getInbTransactions"><span class="type-signature">(async) </span>getInbTransactions<span class="signature">(address, fromTxid)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get all inbound transactions of an address
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>address</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">public address of sender.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fromTxid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Last transaction from which to show transactions.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line170">line 170</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Promise that resolves in an array of objects, each representing
+a transaction. This object properties are:
+ time <number>: 1530022584000,
+ value <number>: in satoshis
+ txid <string>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getTransactions"><span class="type-signature">(async) </span>getTransactions<span class="signature">(address)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get all the transactions of an address.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>address</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">public address of sender.
+e.g. 'mxStSTMNtfeu3tWhw42yfK7M47768JSD2n'</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line117">line 117</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Promise that resolves in an array of objects, each representing
+a transaction. This object properties are:
+ direction <str>: 'inbound' or 'outbound'
+ time <number>: 1530022584000,
+ value <number>: in satoshis
+ txid <string>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
 
 
     </dd>
@@ -317,7 +664,7 @@ e.g. 'mrcDTLhJKA1tD2J9u8LRChYXpscMNw2Pq4'</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line54">line 54</a>
+        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line55">line 55</a>
     </li></ul></dd>
     
 
@@ -476,7 +823,7 @@ e.g. 'mrcDTLhJKA1tD2J9u8LRChYXpscMNw2Pq4'</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line32">line 32</a>
+        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line33">line 33</a>
     </li></ul></dd>
     
 
@@ -731,7 +1078,7 @@ NOTE: 1 Bitcoin(BTC) = 100,000,000 Satoshi</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line76">line 76</a>
+        <a href="wallet.js.html">wallet.js</a>, <a href="wallet.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -799,13 +1146,13 @@ Transaction ID can be then pasted and looked up in sites like https://chain.so/
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createWallet">createWallet</a></li><li><a href="global.html#getUTXOS">getUTXOS</a></li><li><a href="global.html#getWalletBalance">getWalletBalance</a></li><li><a href="global.html#makeTransaction">makeTransaction</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createWallet">createWallet</a></li><li><a href="global.html#getInbTransactions">getInbTransactions</a></li><li><a href="global.html#getTransactions">getTransactions</a></li><li><a href="global.html#getUTXOS">getUTXOS</a></li><li><a href="global.html#getWalletBalance">getWalletBalance</a></li><li><a href="global.html#makeTransaction">makeTransaction</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jun 26 2018 18:59:19 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 29 2018 17:27:41 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

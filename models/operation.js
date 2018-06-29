@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
     userwallet_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    closed_at: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {});
   Operation.associate = function(models) {

@@ -2,8 +2,9 @@ const bitcore = require('bitcore-lib');
 delete global._bitcore; // workaround to resolve double instance of bitcore-lib
 const Insight = require('bitcore-explorers').Insight;
 const insight = new Insight('testnet');
+const request = require('../services/request');
 
-const promisify = require('../services/promisify')
+const promisify = require('../services/promisify');
 const bitcoinNet = process.env.BITCOIN_NET || 'testnet';
 
 /**
@@ -103,11 +104,101 @@ module.exports.makeTransaction = async (
     tx.from(utxos);
     tx.to(receptor, amount);
     tx.change(emisor);
-    tx.fee(fee)
-    tx.sign(privateKey)
-    tx.serialize()
+    tx.fee(fee);
+    tx.sign(privateKey);
+    tx.serialize();
 
     return insight.broadcastPromise(tx.serialize());
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+/**
+ * Get all the transactions of an address.
+ *
+ * @async
+ * @function getTransactions
+ * @param {string} address - public address of sender.
+ * e.g. 'mxStSTMNtfeu3tWhw42yfK7M47768JSD2n'
+ * @return {Promise} - Promise that resolves in an array of objects, each representing
+ * a transaction. This object properties are:
+ *  direction <str>: 'inbound' or 'outbound'
+ *  time <number>: 1530022584000,
+ *  value <number>: in satoshis
+ *  txid <string>
+ */
+module.exports.getTransactions = async (address) => {
+  const netPath = bitcoinNet === 'testnet' ? 'BTCTEST' : 'BTC';
+  try {
+    const operations = [];
+
+    // Fetch inbound and outbound transactions
+    let sentTx = await request(`https://chain.so/api/v2/get_tx_spent/${netPath}/${address}`);
+    sentTx = JSON.parse(sentTx.body).data.txs;
+    let receivedTx = await request(`https://chain.so/api/v2/get_tx_received/${netPath}/${address}`);
+    receivedTx = JSON.parse(receivedTx.body).data.txs;
+
+    // Add 'direction' property and correct format time and properties for each transaction
+    sentTx.forEach(el => {
+      operations.push({
+        direction : 'outbound',
+        time : Number(String(el.time)+'000'),
+        value : (Number(el.value) * 100000000).toFixed(),
+        txid : el.txid,
+      });
+    });
+    receivedTx.forEach(el => {
+      operations.push({
+        direction : 'inbound',
+        time : Number(String(el.time)+'000'),
+        value : (Number(el.value) * 100000000).toFixed(),
+        txid : el.txid,
+      });
+    });
+
+    // Put all transactions in an array and sort them by time
+    operations.sort((a, b) => a.time - b.time);
+
+    // console.log(operations);
+    return operations;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+/**
+ * Get all inbound transactions of an address
+ *
+ * @async
+ * @function getInbTransactions
+ * @param {string} address - public address of sender.
+ * @param {string} fromTxid - Last transaction from which to show transactions.
+ * @return {Promise} - Promise that resolves in an array of objects, each representing
+ * a transaction. This object properties are:
+ *  time <number>: 1530022584000,
+ *  value <number>: in satoshis
+ *  txid <string>
+ */
+module.exports.getInbTransactions = async (address, fromTxid = '') => {
+  const netPath = bitcoinNet === 'testnet' ? 'BTCTEST' : 'BTC';
+  try {
+    const operations = [];
+
+    // Fetch transactions
+    let receivedTx = await request(`https://chain.so/api/v2/get_tx_received/${netPath}/${address}/${fromTxid}`);
+    receivedTx = JSON.parse(receivedTx.body).data.txs;
+
+    // Correct format time and properties for each transaction
+    receivedTx.forEach(el => {
+      operations.push({
+        time : Number(String(el.time)+'000'),
+        value : (Number(el.value) * 100000000).toFixed(),
+        txid : el.txid,
+      });
+    });
+
+    return operations;
   } catch (e) {
     console.error(e);
   }

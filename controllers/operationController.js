@@ -26,6 +26,24 @@ module.exports.executeOperation = async ( oId, votes) => {
       operation.dataValues.target,
       operation.dataValues.amount
     );
+    if (txRes) {
+      const trans = await db.Transaction.create({
+        type:'outbound',
+        amount: operation.dataValues.amount,
+        counter_party: operation.dataValues.target,
+        transaction_str: txRes,
+        operation_id: operation.dataValues.id,
+        wallet_id: w.dataValues.publickey
+      });
+      if (!trans) sendMail.failedRecordingTransaction({
+        type:'outbound',
+        amount: operation.dataValues.amount,
+        counter_party: operation.dataValues.target,
+        transaction_str: txRes,
+        operation_id: operation.dataValues.id,
+        wallet_id: w.dataValues.publickey
+      });
+    }
     for (let vote of votes){
       const user = await db.User.findOne({
         include: [{

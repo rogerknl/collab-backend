@@ -8,6 +8,23 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+module.exports.failedRecordingTransaction = ( tx ) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER,
+    subject: 'Error on registering tx',
+    html: `<h1>Error on registering:</h1><br/><p>${tx}</p>`
+  };
+  transporter.sendMail(mailOptions, function (err, info) {
+    if(err){
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
+      console.log(err)
+    }else
+      console.log(info);
+  });
+};
+
+
 module.exports.testMail = () => {
   const mailOptions = {
     from: process.env.EMAIL_USER,

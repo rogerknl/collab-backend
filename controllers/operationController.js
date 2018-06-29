@@ -60,6 +60,7 @@ module.exports.rejectOperation = async ( oId, votes) => {
       sendMail.opearionRejected(user.dataValues.email,operation.dataValues.message);
     }
   }
+};
 
 module.exports.getOperationHistory = async (ctx) => {
   const operations = await db.Operation.findAll({

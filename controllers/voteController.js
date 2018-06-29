@@ -49,6 +49,7 @@ module.exports.getVotes = async (ctx) => {
     };
     result.push(pendingOp);
   }
+  ctx.jwt.modified = true;
   ctx.body = result;
 };
 
@@ -102,6 +103,7 @@ module.exports.vote = async (ctx) => {
   });
   if(!result) return ctx.body = {error: 'DB error on updating'};
 
+  ctx.jwt.modified = true;
   ctx.body = {'operation_id':ctx.request.body.operation_id};
 
   this.evalVotes(ctx.request.body.operation_id);

@@ -9,8 +9,9 @@ const operCont = require( __dirname + '/controllers/operationController' );
 const voteCont = require( __dirname + '/controllers/voteController' );
 
 router
-  .get('/vote/',(ctx)=>{ctx.body='hello world';})
+  .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)
+  .get('/operations/history', authorize, operCont.getOperationHistory)
   .get('/operations/:operation_id',authorize, operCont.getOperation)
   .post('/vote', authorize, voteCont.vote)
   .post('/wallet/add_user',authorize, userWalletCont.addUserToWallet)

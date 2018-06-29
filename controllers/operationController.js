@@ -3,9 +3,6 @@ const sendMail = require(__dirname + '/../services/mailer');
 const wallet = require(__dirname + '/../services/wallet');
 const db = require( __dirname + '/../models/' );
 
-//
-//makeTransaction = async (
-//  emisor, privateKey, receptor, amount, fee
 
 
 module.exports.executeOperation = async ( oId, votes) => {
@@ -63,6 +60,57 @@ module.exports.rejectOperation = async ( oId, votes) => {
       sendMail.opearionRejected(user.dataValues.email,operation.dataValues.message);
     }
   }
+
+module.exports.getOperationHistory = async (ctx) => {
+  const operations = await db.Operation.findAll({
+    where: {
+      $or:[
+        {result: 'Approved'},
+        {result: 'Rejected'}
+      ]},
+    include: [
+      {
+        model: db.Vote,
+        include: [
+          {
+            model: db.UserWallet,
+            include: [
+              {
+                model: db.User,
+                where: {username: ctx.user.username},
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  });
+  let result =[];
+  for (let operation of operations) {
+    let numberOfVotes = 0;
+    let votingState = 0;
+    let publicKey = '';
+    for (let vote of operation.dataValues.Votes) {
+      if (vote.dataValues.UserWallet) {
+        publicKey = vote.dataValues.UserWallet.dataValues.wallet_id;
+        if (vote.dataValues.value) votingState = vote.dataValues.value;
+      }
+      if (vote.dataValues.value) numberOfVotes ++;
+    }
+    let pendingOp = {
+      publicKey: publicKey,
+      message: operation.dataValues.message,
+      amount: operation.dataValues.amount,
+      target: operation.dataValues.target,
+      result: operation.dataValues.result,
+      operation_id: operation.dataValues.id,
+      votingState: votingState,
+      numberOfVotes: numberOfVotes,
+      numberOfUsers: operation.dataValues.Votes.length
+    };
+    result.push(pendingOp);
+  }
+  ctx.body = result;
 };
 
 module.exports.getOperation = async (ctx) => {

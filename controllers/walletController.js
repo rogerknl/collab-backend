@@ -5,7 +5,34 @@ const userWallet = require ( __dirname + '/userWalletController');
 const db = require (__dirname + '/../models/');
 
 exports.getTxFromWallet = async ( ctx ) => {
-
+  const userId = await db.User.findOne({
+    where: {username: ctx.user.username}
+  });
+  const userWallet = await db.UserWallet.findOne({
+    where: {user_id: userId.id, wallet_id: ctx.params.walletid}
+  });
+  if (!userWallet) return ctx.body = {error: 'User has no rights over this wallet'};
+  const tx = await db.Transaction.findAll({
+    where: {wallet_id:ctx.params.walletid},
+    order: [['DATE', 'DESC']],
+    include: [{
+      model: db.Operation,
+    }]
+  });
+  const result =[];
+  for ( let txi of tx ) {
+    let msg = null;
+    if (txi.dataValues.Operation) msg = txi.dataValues.Operation.dataValues.message;
+    result.push({
+      type: txi.dataValues.type,
+      amount: txi.dataValues.amount,
+      counter_party: txi.dataValues.counter_party,
+      transaction_str: txi.dataValues.transaction_str,
+      date: txi.dataValues.date,
+      message: msg
+    });
+  }
+  ctx.body = result;
 };
 
 exports.registerTxInbound = async (ctx, walletid ) => {

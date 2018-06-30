@@ -2,8 +2,10 @@
 const bcrypt = require('bcrypt');
 const atob = require('atob');
 
+
 const db = require( __dirname + '/../models/' );
-const filterProps = require('../services/utils').filterProps;
+const filterProps = require(__dirname + '/../services/utils').filterProps;
+const mailCont = require(__dirname + '/emailController');
 
 
 module.exports.signIn = async (ctx) => {
@@ -40,6 +42,7 @@ exports.createUser = async (ctx, next) => {
     user['password'] = await bcrypt.hash(user.password, salt)
       .then((hash) => hash);
     await db.User.create(user);
+    mailCont.sendValidEmail(ctx, userData);
     ctx.body = { username: userData.username, email:userData.email };
     ctx.user = { username: userData.username};
     ctx.jwt.modified = true;

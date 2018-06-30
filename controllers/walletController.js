@@ -32,7 +32,8 @@ exports.getTxFromWallet = async ( ctx ) => {
       message: msg
     });
   }
-  ctx.body = result;
+  ctx.jwt.modified = true;
+  ctx.body = {result};
 };
 
 exports.registerTxInbound = async (ctx, walletid ) => {
@@ -87,7 +88,7 @@ exports.getWallets = async (ctx) => {
     });
   for( let auxWallet of  result ) {
     //this.registerTxInbound(ctx, auxWallet.publickey);
-    auxWallet.balance = await wallet.getWalletBalance(auxWallet.publickey);
+    auxWallet.balance = await wallet.getWalletBalance( auxWallet.publickey );
     auxWallet.users = await userWallet.usersOfWallet( auxWallet.publickey );
   }
   ctx.jwt.modified = true;

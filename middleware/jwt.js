@@ -24,7 +24,7 @@ const jWToken = async (ctx, next) => {
       expiresIn: 86400
     });
 
-    ctx.set('x-token',token);
+    // ctx.set('x-token',token);
     if (!ctx.body) {
       ctx.body = {'jwt':token};
     } else {

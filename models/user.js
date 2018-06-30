@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       allowNull: false},
+    valid_email: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     publickey: {
       type: DataTypes.STRING,
       allowNull: true,

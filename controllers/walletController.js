@@ -4,7 +4,9 @@ const cryptoSer = require( __dirname + '/../services/cryptoSer');
 const userWallet = require ( __dirname + '/userWalletController');
 const db = require (__dirname + '/../models/');
 
+exports.getTxFromWallet = async ( ctx ) => {
 
+};
 
 exports.registerTxInbound = async (ctx, walletid ) => {
   //take the last inbound tx in the db
@@ -57,7 +59,7 @@ exports.getWallets = async (ctx) => {
       };
     });
   for( let auxWallet of  result ) {
-    this.registerTxInbound(ctx, auxWallet.publickey);
+    //this.registerTxInbound(ctx, auxWallet.publickey);
     auxWallet.balance = await wallet.getWalletBalance(auxWallet.publickey);
     auxWallet.users = await userWallet.usersOfWallet( auxWallet.publickey );
   }

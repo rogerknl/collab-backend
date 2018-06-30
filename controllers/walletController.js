@@ -16,7 +16,7 @@ exports.registerTxInbound = async (ctx, walletid ) => {
     order: [['DATE', 'DESC']]
   });
   let tx;
-  if ( txR.length === 0 ) tx = await wallet.getInbTransactions(walletid);
+  if ( !txR ) tx = await wallet.getInbTransactions(walletid);
   else tx = await wallet.getInbTransactions(walletid,txR.dataValues.transaction_str);
 
   const result = [];
@@ -57,6 +57,7 @@ exports.getWallets = async (ctx) => {
       };
     });
   for( let auxWallet of  result ) {
+    this.registerTxInbound(ctx, auxWallet.publickey);
     auxWallet.balance = await wallet.getWalletBalance(auxWallet.publickey);
     auxWallet.users = await userWallet.usersOfWallet( auxWallet.publickey );
   }

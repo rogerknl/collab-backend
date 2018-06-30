@@ -18,7 +18,7 @@ module.exports = {
       },
       counter_party: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       transaction_str: {
         type: Sequelize.STRING,

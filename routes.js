@@ -10,6 +10,7 @@ const voteCont = require( __dirname + '/controllers/voteController' );
 
 
 
+
 router
   .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)

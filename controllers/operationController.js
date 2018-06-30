@@ -33,7 +33,8 @@ module.exports.executeOperation = async ( oId, votes) => {
         counter_party: operation.dataValues.target,
         transaction_str: txRes,
         operation_id: operation.dataValues.id,
-        wallet_id: w.dataValues.publickey
+        wallet_id: w.dataValues.publickey,
+        date: Date.now()
       });
       if (!trans) sendMail.failedRecordingTransaction({
         type:'outbound',

@@ -5,6 +5,34 @@ const userWallet = require ( __dirname + '/userWalletController');
 const db = require (__dirname + '/../models/');
 
 
+
+exports.registerTxInbound = async (ctx, walletid ) => {
+  //take the last inbound tx in the db
+  const txR = await db.Transaction.findOne({
+    where:{
+      wallet_id: walletid,
+      type: 'inbound'
+    },
+    order: [['DATE', 'DESC']]
+  });
+  let tx;
+  if ( txR.length === 0 ) tx = await wallet.getInbTransactions(walletid);
+  else tx = await wallet.getInbTransactions(walletid,txR.dataValues.transaction_str);
+
+  const result = [];
+  for(let txi of tx ) {
+    const txToRecord = {
+      type: 'inbound',
+      amount: txi.value,
+      transaction_str: txi.txid,
+      date: new Date(txi.time),
+      wallet_id: walletid
+    };
+    await db.Transaction.create(txToRecord);
+    result.push(txToRecord);
+  }
+};
+
 exports.getWallets = async (ctx) => {
   const userId = await db.User.findOne(
     { where: {username:ctx.user.username},

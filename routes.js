@@ -10,7 +10,9 @@ const voteCont = require( __dirname + '/controllers/voteController' );
 
 
 
+
 router
+  .get('/txTest/:acc',authorize, walletCont.registerTxInbound)
   .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)
   .get('/operations/history', authorize, operCont.getOperationHistory)

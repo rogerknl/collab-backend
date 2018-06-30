@@ -7,11 +7,13 @@ const walletCont = require( __dirname + '/controllers/walletController' );
 const userWalletCont = require( __dirname + '/controllers/userWalletController' );
 const operCont = require( __dirname + '/controllers/operationController' );
 const voteCont = require( __dirname + '/controllers/voteController' );
+const emailCont = require( __dirname + '/controllers/emailController' );
 
 
 
 
 router
+  .get('/transactions/:walletid', authorize, walletCont.getTxFromWallet)
   .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)
   .get('/operations/history', authorize, operCont.getOperationHistory)
@@ -21,6 +23,8 @@ router
   .post('/wallet/add_user',authorize, userWalletCont.addUserToWallet)
   .post('/operations', authorize, operCont.createOperation)
   .post('/wallet', authorize, walletCont.createWallet)
+
+  .get('/emailVal/:key', emailCont.checkValidEmail )
   .post('/login', userCont.signIn)
   .post('/register',userCont.createUser);
 

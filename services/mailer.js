@@ -8,6 +8,46 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+module.exports.emailValidtor = (user,msg) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: user.email,
+    subject: 'Validate email',
+    html: `
+    <html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<style>
+body { font-family:arial; font-size: 9pt; }
+</style>
+<body bgcolor="#FFFFFF" text="#000000">
+<p>Thank you for creating a Collab account. To complete the registration process, please choose one of the options below to verify your e-mail address.</p>
+<br/>
+<p>To confirm your email address, choose one of the following options:
+<br>1. Click this link: <a target='_blank' href='${msg}'>Validate</a>
+<br>2. Copy and paste this URL into your browser&rsquo;s address bar: ${msg}
+</p>
+<p>Thank you for choosing us!</p>
+<br/>
+<p>Sincerely,</p>
+<p>Customer Service</p>
+</body>
+</html>`
+  };
+  transporter.sendMail(mailOptions, function (err, info) {
+    if(err){
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
+    }else
+    // eslint-disable-next-line
+      console.log(info);
+  });
+};
+
 module.exports.failedRecordingTransaction = ( tx ) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -17,9 +57,12 @@ module.exports.failedRecordingTransaction = ( tx ) => {
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
-      console.log(err)
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
     }else
+    // eslint-disable-next-line
       console.log(info);
   });
 };
@@ -34,9 +77,12 @@ module.exports.testMail = () => {
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
-      console.log(err)
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
     }else
+      // eslint-disable-next-line
       console.log(info);
   });
 };
@@ -49,9 +95,12 @@ module.exports.readyToVote = (user,msg) => {
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
-      console.log(err)
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
     }else
+    // eslint-disable-next-line
       console.log(info);
   });
 };
@@ -64,9 +113,12 @@ module.exports.opearionRejected = (email,msg) => {
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
-      console.log(err)
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
     }else
+    // eslint-disable-next-line
       console.log(info);
   });
 };
@@ -79,9 +131,12 @@ module.exports.operationApproved = (email,msg) => {
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
-      console.log(err)
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
     }else
+    // eslint-disable-next-line
       console.log(info);
   });
 };
@@ -94,9 +149,12 @@ module.exports.operationApprovedButfailed = (email,msg) => {
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS)
-      console.log(err)
+      // eslint-disable-next-line
+      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+      // eslint-disable-next-line
+      console.log(err);
     }else
+      // eslint-disable-next-line
       console.log(info);
   });
 };

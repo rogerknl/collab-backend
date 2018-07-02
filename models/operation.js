@@ -1,13 +1,17 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Operation = sequelize.define('Operation', {
-    target: {
+    type: {
       type: DataTypes.STRING,
       allowNull: false
     },
+    target: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     amount: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     message: {
       type: DataTypes.STRING,
@@ -17,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'pending'
+    },
+    user_to_act: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     userwallet_id: {
       type: DataTypes.INTEGER,

@@ -1,11 +1,13 @@
 'use strict';
 const sendMail = require(__dirname + '/../services/mailer');
 const wallet = require(__dirname + '/../services/wallet');
+const uWalletCont = require(__dirname + '/userWalletController');
 const db = require( __dirname + '/../models/' );
 
 const cryptoSer = require( __dirname + '/../services/cryptoSer');
 
 module.exports.executeOperation = async ( oId, votes) => {
+  let txRes;
   const operation = await db.Operation.findOne({where:
   { id: oId}
   });
@@ -20,30 +22,35 @@ module.exports.executeOperation = async ( oId, votes) => {
     const w = await db.Wallet.findOne({ where:
       {publickey: uw.dataValues.wallet_id}
     });
-    let txRes = await wallet.makeTransaction(
-      w.dataValues.publickey,
-      cryptoSer.decryptIv(w.dataValues.privatekey),
-      operation.dataValues.target,
-      operation.dataValues.amount
-    );
-    if (txRes) {
-      const trans = await db.Transaction.create({
-        type:'outbound',
-        amount: operation.dataValues.amount,
-        counter_party: operation.dataValues.target,
-        transaction_str: txRes,
-        operation_id: operation.dataValues.id,
-        wallet_id: w.dataValues.publickey,
-        date: Date.now()
-      });
-      if (!trans) sendMail.failedRecordingTransaction({
-        type:'outbound',
-        amount: operation.dataValues.amount,
-        counter_party: operation.dataValues.target,
-        transaction_str: txRes,
-        operation_id: operation.dataValues.id,
-        wallet_id: w.dataValues.publickey
-      });
+    if ( result.dataValues.type === 'adduser' ) {
+      uWalletCont.addUserToWallet(result.dataValues.user_to_act, w.dataValues.publickey);
+    }
+    else {
+      txRes = await wallet.makeTransaction(
+        w.dataValues.publickey,
+        cryptoSer.decryptIv(w.dataValues.privatekey),
+        operation.dataValues.target,
+        operation.dataValues.amount
+      );
+      if (txRes) {
+        const trans = await db.Transaction.create({
+          type:'outbound',
+          amount: operation.dataValues.amount,
+          counter_party: operation.dataValues.target,
+          transaction_str: txRes,
+          operation_id: operation.dataValues.id,
+          wallet_id: w.dataValues.publickey,
+          date: Date.now()
+        });
+        if (!trans) sendMail.failedRecordingTransaction({
+          type:'outbound',
+          amount: operation.dataValues.amount,
+          counter_party: operation.dataValues.target,
+          transaction_str: txRes,
+          operation_id: operation.dataValues.id,
+          wallet_id: w.dataValues.publickey
+        });
+      }
     }
     for (let vote of votes){
       const user = await db.User.findOne({
@@ -54,7 +61,7 @@ module.exports.executeOperation = async ( oId, votes) => {
           }
         }]
       });
-      if (txRes) sendMail.operationApproved(user.dataValues.email,operation.dataValues.message);
+      if (txRes || result.dataValues.type === 'adduser') sendMail.operationApproved(user.dataValues.email,operation.dataValues.message);
       else sendMail.operationApprovedButfailed(user.dataValues.email,operation.dataValues.message);
     }
   }
@@ -147,8 +154,14 @@ module.exports.getAllOperationsWallet = async ( key ) => {
     });
     const numberOfUsers = votes.length;
     let numberOfVotes = 0;
+    let numberOfAccepted = 0;
+    let numberOfRejected = 0;
     for (let vote of votes) {
-      if (vote.dataValues.value) numberOfVotes ++;
+      if (vote.dataValues.value){
+        numberOfVotes ++;
+        if (vote.dataValues.value === 1) numberOfAccepted++;
+        else if (vote.dataValues.value === 2) numberOfRejected++;
+      }
     }
 
     const opToPush  = {
@@ -158,6 +171,8 @@ module.exports.getAllOperationsWallet = async ( key ) => {
       target: op.dataValues.target,
       result: op.dataValues.result,
       operation_id: op.dataValues.id,
+      numberOfAccepted: numberOfAccepted,
+      numberOfRejected: numberOfRejected,
       numberOfVotes: numberOfVotes,
       numberOfUsers: numberOfUsers,
       closed_at: op.closed_at
@@ -281,6 +296,9 @@ module.exports.createVotes = async (ctx, opId, wId, opMsg) => {
 };
 
 module.exports.createOperation = async (ctx) => {
+
+  console.log(ctx.request.body.username)
+  console.log(ctx.request.body.publicKey)
   //get userAuth Id
   let userId = await db.User.findOne({ where:
   { username:ctx.user.username},
@@ -293,12 +311,38 @@ module.exports.createOperation = async (ctx) => {
   });
   if (!userWalletId) return ctx.body = {error: 'User has no rights over this wallet'};
   //create the operation
-  let operation = await db.Operation.create({
-    target: ctx.request.body.target_publicAdress,
-    amount: ctx.request.body.amount,
-    message: ctx.request.body.message,
-    userwallet_id: userWalletId.id
-  });
+  let type;
+  switch (ctx.url) {
+  case '/wallet/add_user':
+    type = 'adduser';
+    break;
+  default:
+    type = 'transfer';
+  }
+
+  let operation = null ;
+
+  if (type === 'adduser') {
+    const uExist = await db.User.findOne({
+      where: {username:ctx.request.body.username}
+    });
+    if (!uExist) return ctx.body = {error:'This user not exist'};
+    operation = await db.Operation.create({
+      type: type,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id,
+      user_to_act: ctx.request.body.username
+    });
+  } else {
+    operation = await db.Operation.create({
+      type: type,
+      target: ctx.request.body.target_publicAdress,
+      amount: ctx.request.body.amount,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id
+    });
+  }
+
   if (!operation) return ctx.body = {error: 'DB error on inserting'};
   //create all votes for this operation
   let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message);

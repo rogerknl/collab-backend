@@ -8,13 +8,17 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      target: {
+      type: {
         type: Sequelize.STRING,
         allowNull: false
       },
+      target: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       amount: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: true
       },
       message: {
         type: Sequelize.STRING,

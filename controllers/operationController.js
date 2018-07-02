@@ -293,12 +293,38 @@ module.exports.createOperation = async (ctx) => {
   });
   if (!userWalletId) return ctx.body = {error: 'User has no rights over this wallet'};
   //create the operation
-  let operation = await db.Operation.create({
-    target: ctx.request.body.target_publicAdress,
-    amount: ctx.request.body.amount,
-    message: ctx.request.body.message,
-    userwallet_id: userWalletId.id
-  });
+  let type;
+  switch (ctx.url) {
+  case '/wallet/add_user':
+    type = 'adduser';
+    break;
+  default:
+    type = 'transfer';
+  }
+
+  let operation = null ;
+
+  if (type === 'adduser') {
+    const uExist = await db.User.findOne({
+      where: {username:ctx.request.body.username}
+    });
+    if (!uExist) return ctx.body = {error:'This user not exist'};
+    operation = await db.Operation.create({
+      type: type,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id,
+      user_to_act: ctx.request.body.username
+    });
+  } else {
+    operation = await db.Operation.create({
+      type: type,
+      target: ctx.request.body.target_publicAdress,
+      amount: ctx.request.body.amount,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id
+    });
+  }
+
   if (!operation) return ctx.body = {error: 'DB error on inserting'};
   //create all votes for this operation
   let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message);

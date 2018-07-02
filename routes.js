@@ -20,7 +20,7 @@ router
   .get('/operations/history/:wallet_id', authorize, operCont.getOperationHistoryWid)
   .get('/operations/:operation_id',authorize, operCont.getOperation)
   .post('/vote', authorize, voteCont.vote)
-  .post('/wallet/add_user',authorize, userWalletCont.addUserToWallet)
+  .post('/wallet/add_user',authorize, operCont.createOperation)
   .post('/operations', authorize, operCont.createOperation)
   .post('/wallet', authorize, walletCont.createWallet)
 

@@ -1,6 +1,6 @@
 'use strict';
 const sendMail = require(__dirname + '/../services/mailer');
-const cryptoSer = require( __dirname + '/../services/cryptoSer');
+
 const db = require( __dirname + '/../models/' );
 const cacheEmail = require(__dirname + '/../services/cacheEmail');
 const voteCont = require(__dirname + '/voteController');
@@ -14,13 +14,13 @@ module.exports.sendValidEmail = async ( ctx, userData ) => {
     uuid = uuidv4();
     exist = await cacheEmail.getCache(uuid);
   } while(exist);
-  sendMail.emailValidtor(userData, process.env.FRONTEND_URL + '/emailVal/' + uuid );
+  sendMail.emailValidtor(userData, process.env.URL + '/emailVal/' + uuid );
   cacheEmail.setCache( uuid, JSON.stringify({username:userData.username}));
 };
 
 
 module.exports.sendVoteEmail = async ( ctx, userData, msg, uwId, opId) => {
-  const url = process.env.FRONTEND_URL;
+  const url = process.env.URL;
   let ok;
   let ko;
   let exist;
@@ -62,9 +62,7 @@ module.exports.checkValidEmail = async ( ctx ) => {
       });
       if (updated) {
         cacheEmail.delFromCache(ctx.params.key);
-        return ctx.body = `
-        <h1>Thanks for validate your email</h1>
-        `;
+        return ctx.redirect(process.env.FRONTEND_URL + '/eValidated');
       }
     }
     ctx.body = `
@@ -88,6 +86,7 @@ module.exports.voteEmail = async ( ctx ) => {
         userwallet_id: result.userWallet_id,
       }
     });
+    // eslint-disable-next-line
     if (!vote) return console.log({error: 'Vote no valid'});
     const updated = await vote.update({
       value: result.value

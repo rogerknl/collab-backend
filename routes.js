@@ -13,11 +13,13 @@ const emailCont = require( __dirname + '/controllers/emailController' );
 
 router
   .get('/transactions/:walletid', authorize, walletCont.getTxFromWallet)
-  .get('/vote', authorize, voteCont.getVotes)
   .get('/wallet', authorize, walletCont.getWallets)
   .get('/operations/history', authorize, operCont.getOperationHistory)
   .get('/operations/history/:wallet_id', authorize, operCont.getOperationHistoryWid)
+  .get('/operations/pending', authorize, voteCont.getPendingOperations)
+  .get('/operations/pending/:wallet_id', authorize, operCont.getPendingOperationsSpecificWallet)
   .get('/operations/:operation_id',authorize, operCont.getOperation)
+
   .post('/vote', authorize, voteCont.vote)
   .post('/wallet/add_user',authorize, operCont.createOperation)
   .post('/operations', authorize, operCont.createOperation)

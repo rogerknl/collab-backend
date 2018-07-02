@@ -154,8 +154,14 @@ module.exports.getAllOperationsWallet = async ( key ) => {
     });
     const numberOfUsers = votes.length;
     let numberOfVotes = 0;
+    let numberOfAccepted = 0;
+    let numberOfRejected = 0;
     for (let vote of votes) {
-      if (vote.dataValues.value) numberOfVotes ++;
+      if (vote.dataValues.value){
+        numberOfVotes ++;
+        if (vote.dataValues.value === 1) numberOfAccepted++;
+        else if (vote.dataValues.value === 2) numberOfRejected++;
+      }
     }
 
     const opToPush  = {
@@ -165,6 +171,8 @@ module.exports.getAllOperationsWallet = async ( key ) => {
       target: op.dataValues.target,
       result: op.dataValues.result,
       operation_id: op.dataValues.id,
+      numberOfAccepted: numberOfAccepted,
+      numberOfRejected: numberOfRejected,
       numberOfVotes: numberOfVotes,
       numberOfUsers: numberOfUsers,
       closed_at: op.closed_at

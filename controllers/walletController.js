@@ -2,6 +2,7 @@ const wallet = require (__dirname + '/../services/wallet');
 
 const cryptoSer = require( __dirname + '/../services/cryptoSer');
 const userWallet = require ( __dirname + '/userWalletController');
+const operCont = require ( __dirname + '/operationController');
 const db = require (__dirname + '/../models/');
 
 exports.getTxFromWallet = async ( ctx ) => {
@@ -35,6 +36,31 @@ exports.getTxFromWallet = async ( ctx ) => {
   ctx.jwt.modified = true;
   ctx.body = {result};
 };
+
+exports.getTxFromWalletInt = async ( key ) => {
+  const tx = await db.Transaction.findAll({
+    where: {wallet_id:key},
+    order: [['DATE', 'DESC']],
+    include: [{
+      model: db.Operation,
+    }]
+  });
+  const result =[];
+  for ( let txi of tx ) {
+    let msg = null;
+    if (txi.dataValues.Operation) msg = txi.dataValues.Operation.dataValues.message;
+    result.push({
+      type: txi.dataValues.type,
+      amount: txi.dataValues.amount,
+      counter_party: txi.dataValues.counter_party,
+      transaction_str: txi.dataValues.transaction_str,
+      date: txi.dataValues.date,
+      message: msg
+    });
+  }
+  return result;
+};
+
 
 exports.registerTxInbound = async (ctx, walletid ) => {
   //take the last inbound tx in the db
@@ -87,9 +113,11 @@ exports.getWallets = async (ctx) => {
       };
     });
   for( let auxWallet of  result ) {
-    //this.registerTxInbound(ctx, auxWallet.publickey);
+    this.registerTxInbound(ctx, auxWallet.publickey);
     auxWallet.balance = await wallet.getWalletBalance( auxWallet.publickey );
     auxWallet.users = await userWallet.usersOfWallet( auxWallet.publickey );
+    auxWallet.transactions = await this.getTxFromWalletInt( auxWallet.publickey );
+    auxWallet.operations = await operCont.getAllOperationsWallet( auxWallet.publickey );
   }
   ctx.jwt.modified = true;
   ctx.body = {wallets:result};

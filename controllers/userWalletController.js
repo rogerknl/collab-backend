@@ -30,6 +30,7 @@ exports.addUserToWallet = async ( username, wallet_id ) => {
   const alreadyExists = await db.UserWallet.findOne({
     where: {user_id: userToAdd.id, wallet_id: wallet_id}
   });
+    // eslint-disable-next-line
   if (alreadyExists) return console.log({error: 'User already has rights over this Wallet'});
 
   //now addding user to add
@@ -37,6 +38,7 @@ exports.addUserToWallet = async ( username, wallet_id ) => {
     user_id: userToAdd.id,
     wallet_id: wallet_id
   });
+    // eslint-disable-next-line
   if(!result)return console.log({error: 'Unable to isert user'});
 };
 

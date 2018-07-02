@@ -4,7 +4,6 @@ const authorize = require(__dirname + '/middleware/auth');
 
 const userCont = require( __dirname + '/controllers/userController' );
 const walletCont = require( __dirname + '/controllers/walletController' );
-const userWalletCont = require( __dirname + '/controllers/userWalletController' );
 const operCont = require( __dirname + '/controllers/operationController' );
 const voteCont = require( __dirname + '/controllers/voteController' );
 const emailCont = require( __dirname + '/controllers/emailController' );

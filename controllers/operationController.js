@@ -296,9 +296,6 @@ module.exports.createVotes = async (ctx, opId, wId, opMsg) => {
 };
 
 module.exports.createOperation = async (ctx) => {
-
-  console.log(ctx.request.body.username)
-  console.log(ctx.request.body.publicKey)
   //get userAuth Id
   let userId = await db.User.findOne({ where:
   { username:ctx.user.username},

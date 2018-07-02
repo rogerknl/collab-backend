@@ -12,7 +12,8 @@ exports.usersOfWallet = async ( publickey ) => {
   });
   const result = users.map((el)=>{
     return {
-      'username': el.username
+      'username': el.username,
+      'publickey':el.publickey
     };
   });
   return result;

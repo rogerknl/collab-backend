@@ -131,6 +131,41 @@ module.exports.getOperationHistoryWid = async (ctx) => {
   ctx.body = result;
 };
 
+module.exports.getAllOperationsWallet = async ( key ) => {
+  const result = [];
+  const operations = await db.Operation.findAll({
+    include: [{
+      model: db.UserWallet,
+      where: {
+        wallet_id: key
+      }
+    }]
+  });
+  for (let op of operations) {
+    const votes = await db.Vote.findAll({
+      where: {operation_id:op.dataValues.id}
+    });
+    const numberOfUsers = votes.length;
+    let numberOfVotes = 0;
+    for (let vote of votes) {
+      if (vote.dataValues.value) numberOfVotes ++;
+    }
+
+    const opToPush  = {
+      publicKey: key,
+      message: op.dataValues.message,
+      amount: op.dataValues.amount,
+      target: op.dataValues.target,
+      result: op.dataValues.result,
+      operation_id: op.dataValues.id,
+      numberOfVotes: numberOfVotes,
+      numberOfUsers: numberOfUsers,
+      closed_at: op.closed_at
+    };
+    result.push(opToPush);
+  }
+  return result;
+};
 
 module.exports.getOperationHistory = async (ctx) => {
   const operations = await db.Operation.findAll({

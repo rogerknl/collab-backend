@@ -24,6 +24,7 @@ router
   .post('/wallet', authorize, walletCont.createWallet)
 
   .get('/emailVal/:key', emailCont.checkValidEmail )
+  .get('/emailVote/:key', emailCont.checkValidEmail )
   .post('/login', userCont.signIn)
   .post('/register',userCont.createUser);
 

@@ -1,5 +1,6 @@
 'use strict';
 const sendMail = require(__dirname + '/../services/mailer');
+const emailCont = require(__dirname + '/emailController');
 const wallet = require(__dirname + '/../services/wallet');
 const uWalletCont = require(__dirname + '/userWalletController');
 const db = require( __dirname + '/../models/' );
@@ -289,7 +290,8 @@ module.exports.createVotes = async (ctx, opId, wId, opMsg) => {
     let user = await db.User.findOne({where:
       {id: uw.dataValues.user_id}
     });
-    sendMail.readyToVote(user.dataValues,opMsg);
+
+    emailCont.sendVoteEmail ( ctx, user.dataValues, opMsg, uw.dataValues.id, opId);
     if (!vote) error = true;
   }
   return error;

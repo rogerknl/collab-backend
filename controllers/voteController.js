@@ -4,7 +4,7 @@ const db = require( __dirname + '/../models/' );
 
 
 
-module.exports.getVotes = async (ctx) => {
+module.exports.getPendingOperations = async (ctx) => {
   const operations = await db.Operation.findAll({
     where: {result: 'pending'},
     include: [

@@ -86,12 +86,58 @@ module.exports.testMail = () => {
       console.log(info);
   });
 };
-module.exports.readyToVote = (user,msg) => {
+module.exports.readyToVote = (user,msg,urlOK,urlKO) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: user.email,
     subject: 'A new operation is waiting your vote',
-    html: `<h1>New operation:</h1><h2>${msg}</h2><br/><p>We are waiting for your vote: </p>`
+    html: `
+    <html>
+      <head>
+      <style>
+        p {
+          font-size: 16px;
+        }
+        .content{
+          width: 370px;
+          margin: auto;
+        }
+        .votes {
+          margin: auto;
+          text-align:center;
+        }
+        a.btn{
+          display: block;
+          text-decoration: none;
+          color: white;
+          padding:20px;
+          border-radius:10px;
+          margin:10px;
+          font-size: 20px;
+          flex:1;
+        }
+        a.VoteOK{
+          background-color: green;
+        }
+        a.VoteKO{
+          background-color: red;
+        }
+      </style>
+      </head>
+      <body>
+        <div class="content">
+          <h1>New operation:</h1>
+          <h2>${msg}</h2>
+          <br/>
+          <p>We are waiting for your vote: </p>
+          <div class="votes">
+            <a class="btn VoteOK" href="${urlOK}" target="_blank">VOTE YES</a>
+            <a class="btn VoteKO" href="${urlKO}" target="_blank">VOTE NO</a>
+          <div>
+        </div>
+      </body>
+    </html>
+    `
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){

@@ -125,9 +125,10 @@ exports.getWallets = async (ctx) => {
 
 
 exports.createWallet = async (ctx) => {
+  const users = [];
   if (!ctx.request.body.alias) return ctx.body = {ERROR: 'Missing alias'};
   const newWallet = wallet.createWallet();
-  const userId = await db.User.findOne(
+  let userId = await db.User.findOne(
     { where: {username:ctx.user.username},
       attributes: ['id']
     });
@@ -138,12 +139,29 @@ exports.createWallet = async (ctx) => {
     wif: newWallet.privateKeyWIF,
     alias: ctx.request.body.alias
   });
-  const uw = db.UserWallet.create({
+  if (!w) return ctx.body = {error: 'Error on creating the wallet'};
+  let uw = await db.UserWallet.create({
     user_id: userId.dataValues.id,
     wallet_id: w.dataValues.publickey
   });
-
-  if(!uw) ctx.body = {error: 'Error on creating the wallet'};
+  if(!uw) return ctx.body = {error: 'Error on creating the wallet'};
+  for ( let user of ctx.request.body.users) {
+    userId = await db.User.findOne(
+      { where: {username:user},
+        attributes: ['id']
+      });
+    if ( userId ) {
+      uw = await db.UserWallet.create({
+        user_id: userId.dataValues.id,
+        wallet_id: w.dataValues.publickey
+      });
+      if (uw) users.push(user);
+    }
+  }
   ctx.jwt.modified = true;
-  ctx.body = {result:'DONE'};
+  ctx.body = {
+    publicKey:newWallet.address,
+    alias: ctx.request.body.alias,
+    users: users
+  };
 };

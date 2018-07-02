@@ -3,6 +3,7 @@ const sendMail = require(__dirname + '/../services/mailer');
 const cryptoSer = require( __dirname + '/../services/cryptoSer');
 const db = require( __dirname + '/../models/' );
 const cacheEmail = require(__dirname + '/../services/cacheEmail');
+const voteCont = require(__dirname + '/voteController');
 
 const uuidv4 = require('uuid/v4');
 
@@ -38,12 +39,12 @@ module.exports.sendVoteEmail = async ( ctx, userData, msg, uwId, opId) => {
     value: 1,
     koCache: ko
   }));
-  await cacheEmail.setCache( ok, JSON.stringify({
+  await cacheEmail.setCache( ko, JSON.stringify({
     username:userData.username,
     operation_id: opId,
     userWallet_id: uwId,
     value: 2,
-    koCache: ok
+    okCache: ok
   }));
   sendMail.readyToVote(userData, msg, url + '/emailVote/' + ok, url + '/emailVote/' + ko);
 };
@@ -71,26 +72,32 @@ module.exports.checkValidEmail = async ( ctx ) => {
     `;
   }
 };
+
+
+
 module.exports.voteEmail = async ( ctx ) => {
   const key = ctx.params.key;
 
   let result = await cacheEmail.getCache( key );
   if (result) {
     result = JSON.parse(result.data);
+
     const vote = await db.Vote.findOne({
       where: {
         operation_id: result.operation_id,
-        userwallet_id: result.userwallet_id,
+        userwallet_id: result.userWallet_id,
       }
     });
     if (!vote) return console.log({error: 'Vote no valid'});
-    const updated = vote.update({
+    const updated = await vote.update({
       value: result.value
     });
     if (updated) {
       cacheEmail.delFromCache(key);
       if (result.value === 1) cacheEmail.delFromCache(result.koCache);
       else cacheEmail.delFromCache(result.okCache);
+      voteCont.evalVotes(result.operation_id);
+
       return ctx.body = `
         <h1>Thanks for vote</h1>
         `;

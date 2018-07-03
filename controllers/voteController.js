@@ -78,7 +78,7 @@ module.exports.evalVotes = async ( oId ) => {
 
 
 module.exports.vote = async (ctx) => {
-  if (ctx.request.body.valueOfvote !== 1 && ctx.request.body.valueOfvote !== 2) return ctx.body = {error: 'Value of the vote invalid'};
+  if (ctx.request.body.valueOfVote !== 1 && ctx.request.body.valueOfVote !== 2) return ctx.body = {error: 'Value of the vote invalid'};
   //get userAuth Id
   const userId = await db.User.findOne({ where:
     { username:ctx.user.username},
@@ -99,12 +99,14 @@ module.exports.vote = async (ctx) => {
   if(vote.dataValues.value) return ctx.body = {error: 'User has already voted'};
 
   const result = await vote.updateAttributes({
-    value: ctx.request.body.valueOfvote
+    value: ctx.request.body.valueOfVote
   });
   if(!result) return ctx.body = {error: 'DB error on updating'};
 
   ctx.jwt.modified = true;
-  ctx.body = {'operation_id':ctx.request.body.operation_id};
+  ctx.body = {
+    'operation_id':ctx.request.body.operation_id,
+    'publicKey': ctx.request.body.publicKey};
 
   this.evalVotes(ctx.request.body.operation_id);
 };

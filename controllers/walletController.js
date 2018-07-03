@@ -5,6 +5,8 @@ const userWallet = require ( __dirname + '/userWalletController');
 const operCont = require ( __dirname + '/operationController');
 const db = require (__dirname + '/../models/');
 
+const rabbit = require (__dirname + '/../services/rabbitmq');
+
 exports.getTxFromWallet = async ( ctx ) => {
   const userId = await db.User.findOne({
     where: {username: ctx.user.username}
@@ -113,7 +115,8 @@ exports.getWallets = async (ctx) => {
       };
     });
   for( let auxWallet of  result ) {
-    this.registerTxInbound(ctx, auxWallet.publickey);
+    //this.registerTxInbound(ctx, auxWallet.publickey);
+    rabbit.queueSend(ctx, auxWallet.publickey);
     auxWallet.balance = await wallet.getWalletBalance( auxWallet.publickey );
     auxWallet.users = await userWallet.usersOfWallet( auxWallet.publickey );
     auxWallet.transactions = await this.getTxFromWalletInt( auxWallet.publickey );

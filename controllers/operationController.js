@@ -116,7 +116,13 @@ module.exports.executeOperation = async ( oId, votes) => {
       });
       if(user.dataValues.valid_email){
         if (txRes || result.dataValues.type === 'adduser') sendMail.operationApproved(user.dataValues.email,operation.dataValues.message);
-        else sendMail.operationApprovedButfailed(user.dataValues.email,operation.dataValues.message);
+        else {
+          await result.updateAttributes({
+            result: 'Failed',
+            closed_at: Date.now()
+          });
+          sendMail.operationApprovedButfailed(user.dataValues.email,operation.dataValues.message);
+        }
       }
     }
   }
@@ -361,6 +367,7 @@ module.exports.createOperation = async (ctx) => {
   { user_id: userId.id, wallet_id: ctx.request.body.publicKey },
   attributes: ['id']
   });
+
   if (!userWalletId) return ctx.body = {error: 'User has no rights over this wallet'};
   //create the operation
   let type;

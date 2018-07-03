@@ -126,6 +126,7 @@ exports.getWallets = async (ctx) => {
 
 exports.createWallet = async (ctx) => {
   const users = [];
+  const usersKO =[];
   if (!ctx.request.body.alias) return ctx.body = {ERROR: 'Missing alias'};
   const newWallet = wallet.createWallet();
   let userId = await db.User.findOne(
@@ -156,12 +157,14 @@ exports.createWallet = async (ctx) => {
         wallet_id: w.dataValues.publickey
       });
       if (uw) users.push(user);
-    }
+    } else usersKO.push(user);
+
   }
   ctx.jwt.modified = true;
   ctx.body = {
     publicKey:newWallet.address,
     alias: ctx.request.body.alias,
-    users: users
+    users: users,
+    usersNo: usersKO
   };
 };

@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-module.exports.emailValidtor = (user,msg) => {
+module.exports.emailValidator = (user,msg) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: user.email,
@@ -32,7 +32,7 @@ body { font-family:arial; font-size: 9pt; }
 <p>Thank you for choosing us!</p>
 <br/>
 <p>Sincerely,</p>
-<p>Customer Service</p>
+<p>Collab Team</p>
 </body>
 </html>`
   };
@@ -67,30 +67,11 @@ module.exports.failedRecordingTransaction = ( tx ) => {
   });
 };
 
-
-module.exports.testMail = () => {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: 'roger.knl@gmail.com',
-    subject: 'Test de mailer',
-    html: '<h1>Bon dia KNL!!</h1><p>Ara podem posar qualsevol cosa: ¯\\_(ツ)_/¯</p>'
-  };
-  transporter.sendMail(mailOptions, function (err, info) {
-    if(err){
-      // eslint-disable-next-line
-      console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
-      // eslint-disable-next-line
-      console.log(err);
-    }else
-      // eslint-disable-next-line
-      console.log(info);
-  });
-};
-module.exports.readyToVote = (user,msg,urlOK,urlKO) => {
+module.exports.readyToVote = (ucreator, amount, user, msg, urlOK, urlKO, type, username) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: user.email,
-    subject: 'A new operation is waiting your vote',
+    subject: 'A new operation is waiting for your vote',
     html: `
     <html>
       <head>
@@ -128,17 +109,33 @@ module.exports.readyToVote = (user,msg,urlOK,urlKO) => {
         <div class="content">
           <h1>New operation:</h1>
           <h2>${msg}</h2>
-          <br/>
-          <p>We are waiting for your vote: </p>
-          <div class="votes">
-            <a class="btn VoteOK" href="${urlOK}" target="_blank">VOTE YES</a>
-            <a class="btn VoteKO" href="${urlKO}" target="_blank">VOTE NO</a>
-          <div>
-        </div>
-      </body>
-    </html>
-    `
+          <br/>`
   };
+  if (type === 'transfer') {
+    mailOptions.html = mailOptions.html + `
+      <p>Operation creator:${ucreator}</p>
+      <p>Total amount:${amount} Satoshis</p>
+      <p>We are waiting for your vote: </p>
+      <div class="votes">
+        <a class="btn VoteOK" href="${urlOK}" target="_blank">VOTE YES</a>
+        <a class="btn VoteKO" href="${urlKO}" target="_blank">VOTE NO</a>
+      <div>
+    </div>
+    </body>
+    </html>`;
+  } else {
+    mailOptions.html = mailOptions.html + `
+      <p>Operation creator:${ucreator}</p>
+      <p>User to add:${username}</p>
+      <p>We are waiting for your vote: </p>
+      <div class="votes">
+        <a class="btn VoteOK" href="${urlOK}" target="_blank">VOTE YES</a>
+        <a class="btn VoteKO" href="${urlKO}" target="_blank">VOTE NO</a>
+      <div>
+    </div>
+    </body>
+    </html>`;
+  }
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
       // eslint-disable-next-line
@@ -155,7 +152,7 @@ module.exports.opearionRejected = (email,msg) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: 'One operation has been processed',
-    html: `<h1>Operation:</h1><h2>${msg}</h2><br/><p>Has been Rejected</p>`
+    html: `<h1>Operation:</h1><h2>${msg}</h2><br/><p>Has been rejected</p>`
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
@@ -173,7 +170,7 @@ module.exports.operationApproved = (email,msg) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: 'One operation has been processed',
-    html: `<h1>Operation:</h1><h2>${msg}</h2><br/><p>Has been Approved</p>`
+    html: `<h1>Operation:</h1><h2>${msg}</h2><br/><p>Has been approved</p>`
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){
@@ -191,7 +188,7 @@ module.exports.operationApprovedButfailed = (email,msg) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: 'One operation has been processed',
-    html: `<h1>Operation:</h1><h2>${msg}</h2><br/><p>Has been Approved, but has not been executed (ERROR 0012045)</p>`
+    html: `<h1>Operation:</h1><h2>${msg}</h2><br/><p>Has been approved, but has not been executed (ERROR 0012045)</p>`
   };
   transporter.sendMail(mailOptions, function (err, info) {
     if(err){

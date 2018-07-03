@@ -55,7 +55,7 @@ module.exports.getPendingOperationsSpecificWallet = async (ctx) => {
     }
   }
   ctx.jwt.modified = true;
-  ctx.body = result;
+  ctx.body ={operations:result};
 };
 
 
@@ -114,8 +114,10 @@ module.exports.executeOperation = async ( oId, votes) => {
           }
         }]
       });
-      if (txRes || result.dataValues.type === 'adduser') sendMail.operationApproved(user.dataValues.email,operation.dataValues.message);
-      else sendMail.operationApprovedButfailed(user.dataValues.email,operation.dataValues.message);
+      if(user.dataValues.valid_email){
+        if (txRes || result.dataValues.type === 'adduser') sendMail.operationApproved(user.dataValues.email,operation.dataValues.message);
+        else sendMail.operationApprovedButfailed(user.dataValues.email,operation.dataValues.message);
+      }
     }
   }
 };
@@ -138,7 +140,7 @@ module.exports.rejectOperation = async ( oId, votes) => {
           }
         }]
       });
-      sendMail.opearionRejected(user.dataValues.email,operation.dataValues.message);
+      if ( user.dataValues.valid_email) sendMail.opearionRejected(user.dataValues.email,operation.dataValues.message);
     }
   }
 };
@@ -329,7 +331,7 @@ module.exports.getOperation = async (ctx) => {
   ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote};
 };
 
-module.exports.createVotes = async (ctx, opId, wId, opMsg) => {
+module.exports.createVotes = async (ctx, opId, wId, opMsg, amount, type, username) => {
   let error = false;
   let uwIds = await db.UserWallet.findAll({where:
     {wallet_id: wId}
@@ -342,8 +344,7 @@ module.exports.createVotes = async (ctx, opId, wId, opMsg) => {
     let user = await db.User.findOne({where:
       {id: uw.dataValues.user_id}
     });
-
-    emailCont.sendVoteEmail ( ctx, user.dataValues, opMsg, uw.dataValues.id, opId);
+    if ( user.dataValues.valid_email ) emailCont.sendVoteEmail ( ctx, amount, user.dataValues, opMsg, uw.dataValues.id, opId, type, username);
     if (!vote) error = true;
   }
   return error;
@@ -396,7 +397,7 @@ module.exports.createOperation = async (ctx) => {
 
   if (!operation) return ctx.body = {error: 'DB error on inserting'};
   //create all votes for this operation
-  let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message);
+  let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message, ctx.request.body.amount, type, ctx.request.body.username);
   if (!error){
     ctx.jwt.modified = true;
     return ctx.body = {msg: 'Operation and votes created'};

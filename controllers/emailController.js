@@ -14,12 +14,12 @@ module.exports.sendValidEmail = async ( ctx, userData ) => {
     uuid = uuidv4();
     exist = await cacheEmail.getCache(uuid);
   } while(exist);
-  sendMail.emailValidtor(userData, process.env.URL + '/emailVal/' + uuid );
+  sendMail.emailValidator(userData, process.env.URL + '/emailVal/' + uuid );
   cacheEmail.setCache( uuid, JSON.stringify({username:userData.username}));
 };
 
 
-module.exports.sendVoteEmail = async ( ctx, userData, msg, uwId, opId) => {
+module.exports.sendVoteEmail = async ( ctx, amount, userData, msg, uwId, opId, type, username) => {
   const url = process.env.URL;
   let ok;
   let ko;
@@ -46,7 +46,7 @@ module.exports.sendVoteEmail = async ( ctx, userData, msg, uwId, opId) => {
     value: 2,
     okCache: ok
   }));
-  sendMail.readyToVote(userData, msg, url + '/emailVote/' + ok, url + '/emailVote/' + ko);
+  sendMail.readyToVote(ctx.user.username, amount, userData, msg, url + '/emailVote/' + ok, url + '/emailVote/' + ko, type, username);
 };
 
 
@@ -62,13 +62,11 @@ module.exports.checkValidEmail = async ( ctx ) => {
       });
       if (updated) {
         cacheEmail.delFromCache(ctx.params.key);
-        return ctx.redirect(process.env.FRONTEND_URL + '/eValidated');
+        return ctx.redirect(process.env.FRONTEND_URL + '/validationpage');
       }
     }
-    ctx.body = `
-    <h1>Error on the validation process</h1>
-    `;
   }
+  ctx.redirect(process.env.FRONTEND_URL + '/errorvalidation');
 };
 
 
@@ -97,12 +95,8 @@ module.exports.voteEmail = async ( ctx ) => {
       else cacheEmail.delFromCache(result.okCache);
       voteCont.evalVotes(result.operation_id);
 
-      return ctx.body = `
-        <h1>Thanks for vote</h1>
-        `;
+      return ctx.redirect(process.env.FRONTEND_URL + '/thanksmessage');
     }
-    ctx.body = `
-    <h1>Error on the voting process</h1>
-    `;
   }
+  return ctx.redirect(process.env.FRONTEND_URL + '/errorvoting');
 };

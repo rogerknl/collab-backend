@@ -50,7 +50,7 @@ module.exports.getPendingOperations = async (ctx) => {
     result.push(pendingOp);
   }
   ctx.jwt.modified = true;
-  ctx.body = result;
+  ctx.body ={operations:result};
 };
 
 

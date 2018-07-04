@@ -25,12 +25,12 @@ amqp.connect('amqp://localhost', function(err, conn) {
       let resp = await cache.getCacheTime(msg.content.toString());
 
       if (!resp) {
-        await cache.setCacheTime(msg.content.toString(),1,40);
+        await cache.setCacheTime(msg.content.toString(),1,60);
         let ops = await cache.getCacheTime('tx');
-        if( Number(ops) === 4 ) {
+        if( Number(ops) === 5 ) {
           // eslint-disable-next-line
           console.log('halt');
-          await sleep(1500);
+          await sleep(8000);
           ops = 0;
         }
         await registerTxInbound(msg.content.toString());

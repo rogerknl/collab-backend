@@ -187,6 +187,7 @@ module.exports.getInbTransactions = async (address, fromTxid = '') => {
 
     // Fetch transactions
     let receivedTx = await request(`https://chain.so/api/v2/get_tx_received/${netPath}/${address}/${fromTxid}`);
+
     receivedTx = JSON.parse(receivedTx.body).data.txs;
 
     // Correct format time and properties for each transaction

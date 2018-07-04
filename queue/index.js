@@ -83,9 +83,14 @@ const registerTxInbound = async ( walletid ) => {
         await db.Transaction.create(txToRecord);
         result.push(txToRecord);
       }
+    }else {
+
+      await cache.delFromCache (walletid);
+      console.log('deleting from cache');
     }
   } catch (err){
+    await cache.delFromCache (walletid);
     // eslint-disable-next-line
-    console.log(err);
+    console.log('!!!!',err);
   }
 };

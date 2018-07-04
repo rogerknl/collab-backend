@@ -35,6 +35,14 @@ exports.getTxFromWallet = async ( ctx ) => {
       message: msg
     });
   }
+  //remove inbound same idtrans(str)
+  for (let i = 0; i<result.length; i++){
+    if (result[i].type === 'outbound'){
+      if (result[i-1].transaction_str === result[i].transaction_str) {
+        result.splice(i-1, 1);
+      }
+    }
+  }
   ctx.jwt.modified = true;
   ctx.body = {result};
 };
@@ -59,6 +67,14 @@ exports.getTxFromWalletInt = async ( key ) => {
       date: txi.dataValues.date,
       message: msg
     });
+  }
+  //remove inbound same idtrans(str)
+  for (let i = 0; i<result.length; i++){
+    if (result[i].type === 'outbound'){
+      if (result[i-1].transaction_str === result[i].transaction_str) {
+        result.splice(i-1, 1);
+      }
+    }
   }
   return result;
 };

@@ -38,10 +38,17 @@ exports.createUser = async (ctx, next) => {
       ]
     };
   } else {
-    user = filterProps(userData, ['username','password','firstname','lastname','email','publickey']);
+    user = filterProps(userData, ['username','password','firstname','lastname','email','public_key']);
     user['password'] = await bcrypt.hash(user.password, salt)
       .then((hash) => hash);
-    await db.User.create(user);
+    await db.User.create({
+      username: user.username,
+      password: user.password,
+      firstname: user.firstname,
+      lastname: user.lastnme,
+      publickey: user.public_key,
+      email: user.email
+    });
     mailCont.sendValidEmail(ctx, userData);
     ctx.body = { username: userData.username, email:userData.email };
     ctx.user = { username: userData.username};

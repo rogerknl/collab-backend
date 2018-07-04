@@ -41,6 +41,7 @@ module.exports.getPendingOperationsSpecificWallet = async (ctx) => {
         if (vote.dataValues.value) numberOfVotes ++;
       }
       let pendingOp = {
+        type: operation.dataValues.type,
         publicKey: publicKey,
         message: operation.dataValues.message,
         amount: operation.dataValues.amount,
@@ -184,6 +185,7 @@ module.exports.getOperationHistoryWid = async (ctx) => {
     let votingState = 0;
     if (operation.dataValues.Votes[0].dataValues.value) votingState = operation.dataValues.Votes[0].dataValues.value;
     let pendingOp = {
+      type: operation.dataValues.type,
       publicKey: ctx.params.wallet_id,
       message: operation.dataValues.message,
       amount: operation.dataValues.amount,
@@ -226,6 +228,7 @@ module.exports.getAllOperationsWallet = async ( key ) => {
     }
 
     const opToPush  = {
+      type: op.dataValues.type,
       publicKey: key,
       message: op.dataValues.message,
       amount: op.dataValues.amount,
@@ -280,6 +283,7 @@ module.exports.getOperationHistory = async (ctx) => {
       if (vote.dataValues.value) numberOfVotes ++;
     }
     let pendingOp = {
+      type: operation.dataValues.type,
       publicKey: publicKey,
       message: operation.dataValues.message,
       amount: operation.dataValues.amount,
@@ -329,12 +333,12 @@ module.exports.getOperation = async (ctx) => {
   //get info of this operation
   const operation = await db.Operation.findOne({where:
     {id:ctx.params.operation_id},
-  attributes: ['target','amount','message','result']
+  attributes: ['type','target','amount','message','result']
   });
 
   //send the info to the frontend
   ctx.jwt.modified = true;
-  ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote};
+  ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote, 'type':operation.dataValues.type};
 };
 
 module.exports.createVotes = async (ctx, opId, wId, opMsg, amount, type, username) => {
@@ -407,7 +411,25 @@ module.exports.createOperation = async (ctx) => {
   let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message, ctx.request.body.amount, type, ctx.request.body.username);
   if (!error){
     ctx.jwt.modified = true;
-    return ctx.body = {msg: 'Operation and votes created'};
+    let result= {};
+    if ( operation.type === 'adduser' ) result = {
+      type: type,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id,
+      user_to_act: ctx.request.body.username,
+      votingState: 0,
+      publicKey: ctx.request.body.publicKey
+    };
+    else result = {
+      type: type,
+      target: ctx.request.body.target_publicAdress,
+      amount: ctx.request.body.amount,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id,
+      votingState: 0,
+      publicKey: ctx.request.body.publicKey
+    };
+    return ctx.body = result;
   }
   ctx.body = {error: 'DB error on inserting votes'};
 };

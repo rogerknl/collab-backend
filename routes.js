@@ -8,11 +8,9 @@ const operCont = require( __dirname + '/controllers/operationController' );
 const voteCont = require( __dirname + '/controllers/voteController' );
 const emailCont = require( __dirname + '/controllers/emailController' );
 
-const rabbit = require(__dirname + '/services/rabbitmq');
 
 
 router
-  .get('/msg/:key',authorize, rabbit.queueSend)
   .get('/transactions/:walletid', authorize, walletCont.getTxFromWallet)
   .get('/wallet', authorize, walletCont.getWallets)
   .get('/operations/history', authorize, operCont.getOperationHistory)

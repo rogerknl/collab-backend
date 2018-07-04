@@ -41,6 +41,7 @@ module.exports.getPendingOperationsSpecificWallet = async (ctx) => {
         if (vote.dataValues.value) numberOfVotes ++;
       }
       let pendingOp = {
+        type: operation.dataValues.type,
         publicKey: publicKey,
         message: operation.dataValues.message,
         amount: operation.dataValues.amount,
@@ -184,6 +185,7 @@ module.exports.getOperationHistoryWid = async (ctx) => {
     let votingState = 0;
     if (operation.dataValues.Votes[0].dataValues.value) votingState = operation.dataValues.Votes[0].dataValues.value;
     let pendingOp = {
+      type: operation.dataValues.type,
       publicKey: ctx.params.wallet_id,
       message: operation.dataValues.message,
       amount: operation.dataValues.amount,
@@ -226,6 +228,7 @@ module.exports.getAllOperationsWallet = async ( key ) => {
     }
 
     const opToPush  = {
+      type: op.dataValues.type,
       publicKey: key,
       message: op.dataValues.message,
       amount: op.dataValues.amount,
@@ -280,6 +283,7 @@ module.exports.getOperationHistory = async (ctx) => {
       if (vote.dataValues.value) numberOfVotes ++;
     }
     let pendingOp = {
+      type: operation.dataValues.type,
       publicKey: publicKey,
       message: operation.dataValues.message,
       amount: operation.dataValues.amount,
@@ -329,12 +333,12 @@ module.exports.getOperation = async (ctx) => {
   //get info of this operation
   const operation = await db.Operation.findOne({where:
     {id:ctx.params.operation_id},
-  attributes: ['target','amount','message','result']
+  attributes: ['type','target','amount','message','result']
   });
 
   //send the info to the frontend
   ctx.jwt.modified = true;
-  ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote};
+  ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote, 'type':operation.dataValues.type};
 };
 
 module.exports.createVotes = async (ctx, opId, wId, opMsg, amount, type, username) => {

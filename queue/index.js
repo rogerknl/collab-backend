@@ -15,7 +15,7 @@ function sleep(ms){
 
 amqp.connect('amqp://localhost', function(err, conn) {
   conn.createChannel(function(err, ch) {
-    var q = 'hello';
+    var q = 'wallet_id_tx';
 
     ch.assertQueue(q, {durable: false});
     ch.prefetch(1);

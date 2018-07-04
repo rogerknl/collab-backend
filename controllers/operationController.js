@@ -407,7 +407,25 @@ module.exports.createOperation = async (ctx) => {
   let error = await this.createVotes(ctx, operation.dataValues.id, ctx.request.body.publicKey, ctx.request.body.message, ctx.request.body.amount, type, ctx.request.body.username);
   if (!error){
     ctx.jwt.modified = true;
-    return ctx.body = {msg: 'Operation and votes created'};
+    let result= {};
+    if ( operation.type === 'adduser' ) result = {
+      type: type,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id,
+      user_to_act: ctx.request.body.username,
+      votingState: 0,
+      publicKey: ctx.request.body.publicKey
+    };
+    else result = {
+      type: type,
+      target: ctx.request.body.target_publicAdress,
+      amount: ctx.request.body.amount,
+      message: ctx.request.body.message,
+      userwallet_id: userWalletId.id,
+      votingState: 0,
+      publicKey: ctx.request.body.publicKey
+    };
+    return ctx.body = result;
   }
   ctx.body = {error: 'DB error on inserting votes'};
 };

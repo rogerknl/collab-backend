@@ -25,7 +25,7 @@ amqp.connect('amqp://localhost', function(err, conn) {
       let resp = await cache.getCacheTime(msg.content.toString());
 
       if (!resp) {
-        await cache.setCacheTime(msg.content.toString(),1,60);
+        await cache.setCacheTime(msg.content.toString(),1,40);
         let ops = await cache.getCacheTime('tx');
         if( Number(ops) === 5 ) {
           // eslint-disable-next-line

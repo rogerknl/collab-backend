@@ -2,7 +2,7 @@
   "development": {
     "username": "ucollab",
     "password": "P@$$w0rd",
-    "database": "collab",
+    "database": "collab_pres",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

@@ -45,7 +45,8 @@ module.exports.getPendingOperations = async (ctx) => {
       operation_id: operation.dataValues.id,
       votingState: votingState,
       numberOfVotes: numberOfVotes,
-      numberOfUsers: operation.dataValues.Votes.length
+      numberOfUsers: operation.dataValues.Votes.length,
+      user_to_act: operation.dataValues.user_to_act
     };
     result.push(pendingOp);
   }

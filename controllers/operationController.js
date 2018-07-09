@@ -50,7 +50,8 @@ module.exports.getPendingOperationsSpecificWallet = async (ctx) => {
         operation_id: operation.dataValues.id,
         votingState: votingState,
         numberOfVotes: numberOfVotes,
-        numberOfUsers: operation.dataValues.Votes.length
+        numberOfUsers: operation.dataValues.Votes.length,
+        user_to_act: operation.dataValues.user_to_act
       };
       result.push(pendingOp);
     }
@@ -193,6 +194,7 @@ module.exports.getOperationHistoryWid = async (ctx) => {
       result: operation.dataValues.result,
       operation_id: operation.dataValues.id,
       votingState: votingState,
+      user_to_act: operation.dataValues.user_to_act,
       closed_at: operation.closed_at
     };
     result.push(pendingOp);
@@ -239,6 +241,7 @@ module.exports.getAllOperationsWallet = async ( key ) => {
       numberOfRejected: numberOfRejected,
       numberOfVotes: numberOfVotes,
       numberOfUsers: numberOfUsers,
+      user_to_act: op.dataValues.user_to_act,
       closed_at: op.closed_at
     };
     result.push(opToPush);
@@ -293,6 +296,7 @@ module.exports.getOperationHistory = async (ctx) => {
       votingState: votingState,
       numberOfVotes: numberOfVotes,
       numberOfUsers: operation.dataValues.Votes.length,
+      user_to_act: operation.dataValues.user_to_act,
       closed_at: operation.closed_at
     };
     result.push(pendingOp);
@@ -333,12 +337,18 @@ module.exports.getOperation = async (ctx) => {
   //get info of this operation
   const operation = await db.Operation.findOne({where:
     {id:ctx.params.operation_id},
-  attributes: ['type','target','amount','message','result']
+  attributes: ['type','target','amount','message','result','user_to_act']
   });
 
   //send the info to the frontend
   ctx.jwt.modified = true;
-  ctx.body = {...operation.dataValues,'numberOfVotes':numberOfVotes,'numberOfUsers':numberOfUsers,'valueOfVote':valueOfVote, 'type':operation.dataValues.type};
+  ctx.body = {...operation.dataValues,
+    'numberOfVotes':numberOfVotes,
+    'numberOfUsers':numberOfUsers,
+    'valueOfVote':valueOfVote,
+    'type': operation.dataValues.type,
+    'user_to_act': operation.dataValues.user_to_act
+  };
 };
 
 module.exports.createVotes = async (ctx, opId, wId, opMsg, amount, type, username) => {
@@ -361,6 +371,7 @@ module.exports.createVotes = async (ctx, opId, wId, opMsg, amount, type, usernam
 };
 
 module.exports.createOperation = async (ctx) => {
+  console.log(ctx.request.body.amount)
   //get userAuth Id
   let userId = await db.User.findOne({ where:
   { username:ctx.user.username},

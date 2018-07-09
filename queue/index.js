@@ -19,6 +19,7 @@ amqp.connect('amqp://localhost', function(err, conn) {
 
     ch.assertQueue(q, {durable: false});
     ch.prefetch(1);
+    // eslint-disable-next-line
     console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q);
     ch.consume(q,  async (msg) => {
       let resp = await cache.getCacheTime(msg.content.toString());
@@ -26,9 +27,10 @@ amqp.connect('amqp://localhost', function(err, conn) {
       if (!resp) {
         await cache.setCacheTime(msg.content.toString(),1,40);
         let ops = await cache.getCacheTime('tx');
-        if( Number(ops) === 4 ) {
+        if( Number(ops) === 5 ) {
+          // eslint-disable-next-line
           console.log('halt');
-          await sleep(1500);
+          await sleep(8000);
           ops = 0;
         }
         await registerTxInbound(msg.content.toString());
@@ -36,11 +38,13 @@ amqp.connect('amqp://localhost', function(err, conn) {
         if(!ops)ops=0;
         await cache.setCacheTime('tx',Number(ops)+1,1);
         ops = await cache.getCacheTime('tx');
+        // eslint-disable-next-line
         console.log(" [x] Received %s", msg.content.toString(),ops);
         ch.ack(msg);
       }
       else {
         ch.ack(msg);
+        // eslint-disable-next-line
         console.log('cached');
       }
     }, {noAck: false});
@@ -64,7 +68,6 @@ const registerTxInbound = async ( walletid ) => {
     }
     else {
       tx = await wallet.getInbTransactions(walletid,txR.dataValues.transaction_str);
-      console.log(tx);
     }
 
     const result = [];
@@ -80,8 +83,14 @@ const registerTxInbound = async ( walletid ) => {
         await db.Transaction.create(txToRecord);
         result.push(txToRecord);
       }
+    }else {
+
+      await cache.delFromCache (walletid);
+      console.log('deleting from cache');
     }
   } catch (err){
-    console.log('HALT!!!', err);
+    await cache.delFromCache (walletid);
+    // eslint-disable-next-line
+    console.log('!!!!',err);
   }
 };

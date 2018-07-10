@@ -51,7 +51,7 @@ $ node index.js
 
 
 
-##### *** This app requires its frontEnd you can find it [here](https://github.com/YourParmenides/collab-frontend/tree/MVP) ***
+##### *** This app requires its frontEnd you can find it [here](https://github.com/YourParmenides/collab-frontend/) ***
 
 
 

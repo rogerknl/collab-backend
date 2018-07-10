@@ -13,6 +13,8 @@
 </p>  
 
 ## Getting started
+Previous installation of redis, mysql and rabbitmq is required. 
+Install them with brew and run them one by one with command 'brew services start ______'
 
 1. Clone the repo
 
